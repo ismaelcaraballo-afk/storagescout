@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StorageScout: Energy Storage Impact Simulator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #0a0f1a;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* Header */
+.hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-bottom: 1px solid #1e3a5f;
+  padding: 40px 20px 30px;
+  text-align: center;
+}
+.hero h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #38bdf8, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.hero p {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 24px 20px;
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  flex-wrap: wrap;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.stat-value.green { color: #34d399; }
+.stat-value.red { color: #f87171; }
+.stat-value.amber { color: #fbbf24; }
+.stat-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* Main grid */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #334155;
+}
+.card h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.card .subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+.card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Slider */
+.slider-section {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: 12px;
+  padding: 30px;
+  border: 1px solid #334155;
+  text-align: center;
+}
+.slider-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+.slider-section .subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+.slider-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 500px;
+  max-width: 80%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #334155, #38bdf8);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(56,189,248,0.5);
+}
+.slider-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #38bdf8;
+  min-width: 70px;
+}
+.impact-result {
+  font-size: 1.1rem;
+  color: #34d399;
+  margin-top: 10px;
+  min-height: 28px;
+}
+
+/* State selector */
+select {
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+/* Insight box */
+.insight-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-left: 4px solid #38bdf8;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* Narrative section */
+.narrative {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 30px;
+}
+.narrative h2 {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  color: #f8fafc;
+}
+.narrative-steps {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.narrative-step {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+  width: 280px;
+  border: 1px solid #334155;
+  text-align: left;
+}
+.narrative-step .step-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.narrative-step .step-label.setup { color: #38bdf8; }
+.narrative-step .step-label.conflict { color: #f87171; }
+.narrative-step .step-label.resolution { color: #34d399; }
+.narrative-step p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+.narrative-step .big-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: #475569;
+  font-size: 0.8rem;
+  border-top: 1px solid #1e293b;
+  margin-top: 20px;
+}
+.footer a { color: #38bdf8; text-decoration: none; }
+
+canvas { max-height: 300px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>StorageScout</h1>
+  <p>Where should the next battery be built? Explore how energy storage deployment impacts emissions across the U.S.</p>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-value">26 GW</div>
+    <div class="stat-label">US Storage Installed (2024)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value green">93%</div>
+    <div class="stat-label">Battery Cost Decline Since 2010</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value red">3.4M MWh</div>
+    <div class="stat-label">Clean Energy Curtailed (CA, 2024)</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value amber">2,300 GW</div>
+    <div class="stat-label">Stuck in Interconnection Queue</div>
+  </div>
+</div>
+
+<!-- STORYTELLING -->
+<div class="main">
+
+<div class="narrative">
+  <h2>The Story in Three Acts</h2>
+  <div class="narrative-steps">
+    <div class="narrative-step">
+      <div class="step-label setup">Setup</div>
+      <div class="big-number" style="color:#38bdf8;">$2.3 Trillion</div>
+      <p>Global clean energy investment in 2025. Battery costs have fallen 93% since 2010. Solar and wind are now cheaper than coal and gas. The money has voted.</p>
+    </div>
+    <div class="narrative-step">
+      <div class="step-label conflict">Conflict</div>
+      <div class="big-number" style="color:#f87171;">Storage +200%<br>Emissions -8%</div>
+      <p>Storage is growing exponentially but emissions are barely moving. Why? 2,300 GW of projects are stuck in a 5-year approval queue. We're generating clean energy and throwing it away.</p>
+    </div>
+    <div class="narrative-step">
+      <div class="step-label resolution">Resolution</div>
+      <div class="big-number" style="color:#34d399;">3.5M Jobs</div>
+      <p>The states that invested in storage — Texas, California — are proving the model works. Clean energy employs 3.5 million Americans. The two fastest-growing jobs in the US are both in renewable energy.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CHART 1: Storage Growth -->
+<div class="card">
+  <h2>US Battery Storage Capacity</h2>
+  <div class="subtitle">Gigawatts installed, 2019-2024 (EIA)</div>
+  <canvas id="storageChart"></canvas>
+</div>
+
+<!-- CHART 2: Emissions Gap -->
+<div class="card">
+  <h2>The Gap: Storage vs Emissions</h2>
+  <div class="subtitle">Storage surging, emissions barely moving</div>
+  <canvas id="gapChart"></canvas>
+</div>
+
+<!-- CHART 3: State Comparison -->
+<div class="card">
+  <h2>Top States by Storage Capacity</h2>
+  <div class="subtitle">Who's leading the storage race? (MW, 2024)</div>
+  <canvas id="stateChart"></canvas>
+</div>
+
+<!-- CHART 4: State Explorer -->
+<div class="card">
+  <h2>State Explorer</h2>
+  <div class="subtitle">Pick a state to see its storage story</div>
+  <select id="stateSelect">
+    <option value="CA">California</option>
+    <option value="TX">Texas</option>
+    <option value="AZ">Arizona</option>
+    <option value="NV">Nevada</option>
+    <option value="FL">Florida</option>
+    <option value="NY">New York</option>
+    <option value="IL">Illinois</option>
+    <option value="GA">Georgia</option>
+    <option value="VA">Virginia</option>
+    <option value="CO">Colorado</option>
+  </select>
+  <canvas id="stateDetailChart"></canvas>
+  <div class="insight-box" id="stateInsight"></div>
+</div>
+
+<!-- SIMULATOR -->
+<div class="slider-section">
+  <h2>What-If Simulator</h2>
+  <div class="subtitle">If we accelerated storage deployment, how much would emissions drop?</div>
+  <div class="slider-row">
+    <span style="color:#64748b">1x</span>
+    <input type="range" min="100" max="500" value="100" id="simSlider">
+    <span class="slider-value" id="sliderLabel">1.0x</span>
+  </div>
+  <canvas id="simChart" style="max-height:280px;margin:0 auto;max-width:700px;"></canvas>
+  <div class="impact-result" id="impactResult"></div>
+</div>
+
+<!-- COST CHART -->
+<div class="card full-width">
+  <h2>Why This Is Happening: The Cost Collapse</h2>
+  <div class="subtitle">Levelized cost of energy by source, $/MWh (IRENA/Lazard)</div>
+  <canvas id="costChart" style="max-height:250px;"></canvas>
+</div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  Data: <a href="https://www.eia.gov/opendata/">EIA</a> |
+  <a href="https://www.irena.org/Data">IRENA</a> |
+  <a href="https://www.bls.gov/">BLS</a> |
+  <a href="https://www.iea.org/">IEA</a> |
+  BloombergNEF &mdash;
+  Built by Ismael, Kevin &amp; Juan &mdash; Pursuit Cycle 3
+</div>
+
+<script>
+// --- REAL DATA (sourced from EIA, IRENA, BloombergNEF) ---
+
+// US Battery Storage Capacity (GW) - EIA
+const storageYears = ['2019','2020','2021','2022','2023','2024'];
+const storageGW = [1.2, 1.8, 4.4, 8.9, 16.2, 26.0];
+
+// US Power Sector CO2 Emissions (MMT) - EIA
+const emissionsYears = ['2019','2020','2021','2022','2023','2024'];
+const emissionsMMT = [1724, 1570, 1653, 1640, 1584, 1546];
+
+// Top States by Storage (MW, 2024) - EIA
+const stateNames = ['CA','TX','AZ','NV','FL','NY','IL','GA','VA','CO'];
+const stateMW = [7492, 5200, 2100, 1800, 1500, 1200, 900, 750, 600, 480];
+
+// State detail data: [storage MW, renewable gen TWh, curtailment GWh, emissions MMT]
+const stateData = {
+  'CA': {storage:7492, renewable:105, curtailed:3400, emissions:58, insight:"California leads in storage but also leads in curtailment — 3.4M MWh of clean energy wasted in 2024. More storage directly solves this."},
+  'TX': {storage:5200, renewable:145, curtailed:1200, emissions:198, insight:"Texas has the most renewable generation AND the most emissions. Storage is growing 70x since 2020 but fossil gas still dominates. Biggest opportunity in the country."},
+  'AZ': {storage:2100, renewable:18, curtailed:280, emissions:34, insight:"Arizona has massive solar potential but limited storage. With 300+ days of sunshine, even moderate storage additions have outsized impact."},
+  'NV': {storage:1800, renewable:14, curtailed:150, emissions:11, insight:"Nevada punches above its weight — strong policy support and the Gemini solar+storage project (690 MW) is one of the largest in the world."},
+  'FL': {storage:1500, renewable:22, curtailed:90, emissions:114, insight:"Florida has enormous solar potential but lags in policy. Storage deployment is growing but well behind its potential given population and demand."},
+  'NY': {storage:1200, renewable:38, curtailed:120, emissions:33, insight:"New York has aggressive 2030 targets (6 GW storage) but is behind schedule. Grid congestion upstate wastes wind energy that downstate needs."},
+  'IL': {storage:900, renewable:28, curtailed:80, emissions:48, insight:"Illinois benefits from strong wind resources and the Climate and Equitable Jobs Act. Storage is growing but interconnection delays are slowing deployment."},
+  'GA': {storage:750, renewable:16, curtailed:40, emissions:55, insight:"Georgia is a surprise riser — solar is booming thanks to utility-scale projects, but storage is just starting to follow."},
+  'VA': {storage:600, renewable:12, curtailed:30, emissions:30, insight:"Virginia's Clean Economy Act targets 3.1 GW of storage by 2035. Currently behind but policy framework is strong."},
+  'CO': {storage:480, renewable:22, curtailed:60, emissions:32, insight:"Colorado has strong renewable resources and Xcel Energy is driving utility-scale storage. Rural areas have the most untapped potential."}
+};
+
+// Cost data ($/MWh LCOE) - IRENA/Lazard 2024
+const costSources = ['Solar PV','Onshore Wind','Battery Storage','Natural Gas','Coal'];
+const costPerMWh = [43, 34, 65, 77, 68];
+const costColors = ['#fbbf24','#38bdf8','#34d399','#f87171','#6b7280'];
+
+// --- CHART 1: Storage Growth ---
+new Chart(document.getElementById('storageChart'), {
+  type: 'bar',
+  data: {
+    labels: storageYears,
+    datasets: [{
+      label: 'Battery Storage (GW)',
+      data: storageGW,
+      backgroundColor: 'rgba(56, 189, 248, 0.7)',
+      borderColor: '#38bdf8',
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' GW' }}
+    },
+    scales: {
+      y: {
+        title: { display: true, text: 'Gigawatts (GW)', color: '#64748b' },
+        grid: { color: '#1e293b' },
+        ticks: { color: '#94a3b8' }
+      },
+      x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+    }
+  }
+});
+
+// --- CHART 2: Gap Chart (dual axis) ---
+new Chart(document.getElementById('gapChart'), {
+  type: 'line',
+  data: {
+    labels: emissionsYears,
+    datasets: [
+      {
+        label: 'Storage (GW)',
+        data: storageGW,
+        borderColor: '#34d399',
+        backgroundColor: 'rgba(52,211,153,0.1)',
+        borderWidth: 3,
+        tension: 0.3,
+        fill: true,
+        yAxisID: 'y'
+      },
+      {
+        label: 'Emissions (MMT CO\u2082)',
+        data: emissionsMMT,
+        borderColor: '#f87171',
+        borderWidth: 3,
+        borderDash: [8, 4],
+        tension: 0.3,
+        yAxisID: 'y1'
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { color: '#94a3b8' } }
+    },
+    scales: {
+      y: {
+        type: 'linear', position: 'left',
+        title: { display: true, text: 'Storage (GW)', color: '#34d399' },
+        grid: { color: '#1e293b' },
+        ticks: { color: '#34d399' }
+      },
+      y1: {
+        type: 'linear', position: 'right',
+        title: { display: true, text: 'Emissions (MMT CO\u2082)', color: '#f87171' },
+        grid: { drawOnChartArea: false },
+        ticks: { color: '#f87171' }
+      },
+      x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+    }
+  }
+});
+
+// --- CHART 3: State Comparison ---
+new Chart(document.getElementById('stateChart'), {
+  type: 'bar',
+  data: {
+    labels: stateNames,
+    datasets: [{
+      label: 'Storage Capacity (MW)',
+      data: stateMW,
+      backgroundColor: stateMW.map((v,i) => i < 2 ? 'rgba(52,211,153,0.7)' : 'rgba(56,189,248,0.5)'),
+      borderColor: stateMW.map((v,i) => i < 2 ? '#34d399' : '#38bdf8'),
+      borderWidth: 1,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.parsed.x.toLocaleString() + ' MW' }}
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Megawatts (MW)', color: '#64748b' },
+        grid: { color: '#1e293b' },
+        ticks: { color: '#94a3b8' }
+      },
+      y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+    }
+  }
+});
+
+// --- CHART 4: State Detail ---
+let stateDetailChart = null;
+function updateStateDetail() {
+  const st = document.getElementById('stateSelect').value;
+  const d = stateData[st];
+
+  if (stateDetailChart) stateDetailChart.destroy();
+
+  stateDetailChart = new Chart(document.getElementById('stateDetailChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Storage (MW)', 'Renewables (TWh)', 'Curtailed (GWh)', 'Emissions (MMT)'],
+      datasets: [{
+        data: [d.storage, d.renewable, d.curtailed, d.emissions],
+        backgroundColor: ['#38bdf8', '#34d399', '#fbbf24', '#f87171'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+      }
+    }
+  });
+
+  document.getElementById('stateInsight').innerHTML = '<strong>Insight:</strong> ' + d.insight;
+}
+document.getElementById('stateSelect').onchange = updateStateDetail;
+updateStateDetail();
+
+// --- CHART 5: Cost Comparison ---
+new Chart(document.getElementById('costChart'), {
+  type: 'bar',
+  data: {
+    labels: costSources,
+    datasets: [{
+      label: '$/MWh',
+      data: costPerMWh,
+      backgroundColor: costColors.map(c => c + 'bb'),
+      borderColor: costColors,
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => '$' + ctx.parsed.y + '/MWh' } },
+      annotation: {
+        annotations: {
+          threshold: {
+            type: 'line', yMin: 50, yMax: 50,
+            borderColor: '#34d399', borderWidth: 2, borderDash: [6, 4],
+            label: { display: true, content: 'Competitive threshold', color: '#34d399', position: 'start' }
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        title: { display: true, text: '$/MWh (Levelized Cost)', color: '#64748b' },
+        grid: { color: '#1e293b' },
+        ticks: { color: '#94a3b8', callback: v => '$' + v }
+      },
+      x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+    }
+  }
+});
+
+// --- SIMULATOR ---
+const simBaseStorage = [1.2, 1.8, 4.4, 8.9, 16.2, 26.0];
+const simBaseEmissions = [1724, 1570, 1653, 1640, 1584, 1546];
+// Projected years
+const simYears = ['2019','2020','2021','2022','2023','2024','2025','2026','2027'];
+// Extend with projections
+const simStorageFull = [...simBaseStorage, 38, 52, 70];
+const simEmissionsFull = [...simBaseEmissions, 1510, 1475, 1440];
+
+let simChart = new Chart(document.getElementById('simChart'), {
+  type: 'line',
+  data: {
+    labels: simYears,
+    datasets: [
+      {
+        label: 'Projected Storage (GW)',
+        data: [...simStorageFull],
+        borderColor: '#38bdf8',
+        backgroundColor: 'rgba(56,189,248,0.1)',
+        borderWidth: 3,
+        tension: 0.3,
+        fill: true,
+        pointRadius: simYears.map((y,i) => i >= 6 ? 5 : 3),
+        pointStyle: simYears.map((y,i) => i >= 6 ? 'triangle' : 'circle'),
+      },
+      {
+        label: 'Projected Emissions (MMT CO\u2082)',
+        data: [...simEmissionsFull],
+        borderColor: '#f87171',
+        borderWidth: 3,
+        borderDash: [8, 4],
+        tension: 0.3,
+        pointRadius: simYears.map((y,i) => i >= 6 ? 5 : 3),
+        pointStyle: simYears.map((y,i) => i >= 6 ? 'triangle' : 'circle'),
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { color: '#94a3b8' } },
+      tooltip: {
+        callbacks: {
+          afterBody: function(items) {
+            if (items[0] && parseInt(items[0].label) >= 2025) {
+              return '\u25B2 Projected';
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        title: { display: true, text: 'Storage (GW) / Emissions (MMT)', color: '#64748b' },
+        grid: { color: '#1e293b' },
+        ticks: { color: '#94a3b8' }
+      },
+      x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+    }
+  }
+});
+
+const simSlider = document.getElementById('simSlider');
+const sliderLabel = document.getElementById('sliderLabel');
+const impactResult = document.getElementById('impactResult');
+
+function updateSim() {
+  const factor = simSlider.value / 100;
+  sliderLabel.textContent = factor.toFixed(1) + 'x';
+
+  // Only projected years (2025-2027) change
+  const newStorage = simStorageFull.map((v, i) => {
+    if (i < 6) return v; // historical stays fixed
+    return Math.round(v * factor * 10) / 10;
+  });
+
+  // More storage = more emissions reduction (each additional GW reduces ~2 MMT)
+  const newEmissions = simEmissionsFull.map((v, i) => {
+    if (i < 6) return v;
+    const extraGW = newStorage[i] - simStorageFull[i];
+    return Math.round(v - (extraGW * 2));
+  });
+
+  simChart.data.datasets[0].data = newStorage;
+  simChart.data.datasets[1].data = newEmissions;
+  simChart.update();
+
+  const totalExtraReduction = Math.round(
+    (simEmissionsFull[8] - newEmissions[8])
+  );
+
+  if (totalExtraReduction > 0) {
+    const homesEquiv = Math.round(totalExtraReduction * 500000);
+    impactResult.innerHTML =
+      '<strong>' + factor.toFixed(1) + 'x</strong> storage growth by 2027 = <strong>' +
+      totalExtraReduction + ' MMT</strong> additional CO\u2082 reduction' +
+      ' \u2014 equivalent to taking <strong>' +
+      homesEquiv.toLocaleString() + '</strong> homes off fossil power';
+  } else {
+    impactResult.innerHTML = 'Baseline projection: storage grows at current rate';
+  }
+}
+
+simSlider.oninput = updateSim;
+updateSim();
+</script>
+</body>
+</html>
