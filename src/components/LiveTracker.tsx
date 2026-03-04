@@ -2,6 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { fetchLiveCarbonData, getBestTimeAdvice, type CarbonData } from '../services/carbonApi';
 import { Gauge, Zap, Leaf, RefreshCw, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
+import CarbonIntensityTracker from './CarbonIntensityTracker';
+
+// Live location data for solar API (Open-Meteo)
+const LIVE_LOCATIONS = [
+  { city: 'California', state: 'CA', lat: 36.7, lon: -120.0, storageMW: 7492, curtailedGWh: 3400 },
+  { city: 'Texas', state: 'TX', lat: 31.8, lon: -99.2, storageMW: 5200, curtailedGWh: 1200 },
+  { city: 'Arizona', state: 'AZ', lat: 33.7, lon: -111.4, storageMW: 2100, curtailedGWh: 280 },
+  { city: 'Nevada', state: 'NV', lat: 38.8, lon: -117.2, storageMW: 1800, curtailedGWh: 150 },
+  { city: 'Florida', state: 'FL', lat: 27.7, lon: -81.8, storageMW: 1500, curtailedGWh: 90 },
+  { city: 'New York', state: 'NY', lat: 42.7, lon: -74.9, storageMW: 1200, curtailedGWh: 120 },
+  { city: 'Illinois', state: 'IL', lat: 40.3, lon: -89.0, storageMW: 900, curtailedGWh: 80 },
+  { city: 'Georgia', state: 'GA', lat: 32.9, lon: -83.6, storageMW: 750, curtailedGWh: 40 },
+  { city: 'Virginia', state: 'VA', lat: 37.5, lon: -78.5, storageMW: 600, curtailedGWh: 30 },
+  { city: 'Colorado', state: 'CO', lat: 39.1, lon: -105.2, storageMW: 480, curtailedGWh: 60 },
+];
 
 interface LiveTrackerProps {
   onIntensityUpdate: (intensity: number) => void;
@@ -12,6 +27,23 @@ export default function LiveTracker({ onIntensityUpdate }: LiveTrackerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [solarData, setSolarData] = useState<any>(null);
+  const [simFactor, setSimFactor] = useState(1.0);
+
+  // Fetch solar data from Open-Meteo API
+  const fetchSolarData = async () => {
+    try {
+      const queries = LIVE_LOCATIONS.map(
+        (loc) =>
+          `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=direct_radiation,diffuse_radiation,temperature_2m,is_day&hourly=direct_radiation,diffuse_radiation,temperature_2m&timezone=auto`
+      );
+
+      const results = await Promise.all(queries.map((url) => fetch(url).then((r) => r.json())));
+      setSolarData(results);
+    } catch (err) {
+      console.error('Error fetching solar data:', err);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -30,7 +62,11 @@ export default function LiveTracker({ onIntensityUpdate }: LiveTrackerProps) {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000 * 5); // Update every 5 mins
+    fetchSolarData();
+    const interval = setInterval(() => {
+      fetchData();
+      fetchSolarData();
+    }, 60000 * 5); // Update every 5 mins
     return () => clearInterval(interval);
   }, []);
 
@@ -151,6 +187,11 @@ export default function LiveTracker({ onIntensityUpdate }: LiveTrackerProps) {
 
       <div className="mt-4 text-center text-xs text-slate-600">
         Data Sources: WattTime API, Electricity Maps • Last Updated: {lastUpdated?.toLocaleTimeString()}
+      </div>
+
+      {/* Carbon Intensity Tracker (Juan's advanced modeling) */}
+      <div className="mt-8 border-t border-slate-800 pt-8">
+        <CarbonIntensityTracker solarData={solarData} simFactor={simFactor} />
       </div>
     </div>
   );
