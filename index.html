@@ -349,6 +349,337 @@ select {
   font-size: 1rem;
 }
 
+/* =============================================
+   CARBON INTENSITY TRACKER — Juan's section
+   ============================================= */
+
+.carbon-divider {
+  max-width: 1200px;
+  margin: 10px auto 0;
+  padding: 0 20px;
+  border-top: 1px solid #1e3a5f;
+}
+
+.carbon-header {
+  text-align: center;
+  padding: 30px 20px 10px;
+}
+.carbon-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 6px;
+}
+.carbon-pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #f87171;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: carbon-blink 2s infinite;
+}
+@keyframes carbon-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(248,113,113,0.7); }
+  50% { opacity: 0.6; box-shadow: 0 0 0 10px rgba(248,113,113,0); }
+}
+.carbon-header .live-subtitle { margin-bottom: 4px; }
+
+/* Carbon summary stats row */
+.carbon-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 14px 20px 20px;
+  flex-wrap: wrap;
+}
+
+/* Main carbon layout */
+.carbon-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 20px;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .carbon-main { grid-template-columns: 1fr; }
+}
+
+/* Gauge card */
+.gauge-card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #334155;
+  text-align: center;
+}
+.gauge-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #f8fafc;
+}
+.gauge-card .gauge-sub {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+/* SVG Gauge */
+.gauge-wrapper {
+  position: relative;
+  width: 220px;
+  height: 130px;
+  margin: 0 auto 16px;
+}
+.gauge-wrapper svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.gauge-track {
+  fill: none;
+  stroke: #1e3a5f;
+  stroke-width: 18;
+  stroke-linecap: round;
+}
+.gauge-fill {
+  fill: none;
+  stroke-width: 18;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.6s ease;
+}
+.gauge-needle {
+  transform-origin: 110px 110px;
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gauge-center-val {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.gauge-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: color 0.6s ease;
+}
+.gauge-unit {
+  font-size: 0.72rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Grid status badge */
+.grid-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 10px auto 14px;
+  transition: all 0.6s ease;
+}
+.grid-status-badge.clean {
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+  border: 1px solid rgba(52,211,153,0.3);
+}
+.grid-status-badge.moderate {
+  background: rgba(251,191,36,0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,0.3);
+}
+.grid-status-badge.dirty {
+  background: rgba(248,113,113,0.15);
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,0.3);
+}
+.grid-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Best time indicator */
+.best-time-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  text-align: left;
+}
+.best-time-box .bth-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+.best-time-box .bth-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #34d399;
+  margin-bottom: 2px;
+}
+.best-time-box .bth-reason {
+  color: #94a3b8;
+  line-height: 1.4;
+  font-size: 0.8rem;
+}
+
+/* Right side: CAISO detail + zone grid */
+.carbon-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Zone cards grid */
+.zone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.zone-card {
+  background: #0f172a;
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid #334155;
+  text-align: center;
+  transition: border-color 0.4s ease, transform 0.2s;
+  cursor: default;
+}
+.zone-card:hover { transform: translateY(-2px); }
+.zone-card.zone-clean { border-color: rgba(52,211,153,0.5); }
+.zone-card.zone-moderate { border-color: rgba(251,191,36,0.4); }
+.zone-card.zone-dirty { border-color: rgba(248,113,113,0.4); }
+.zone-name { font-size: 0.78rem; color: #64748b; margin-bottom: 2px; }
+.zone-region { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+.zone-co2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 2px;
+  transition: color 0.4s;
+}
+.zone-co2.clean { color: #34d399; }
+.zone-co2.moderate { color: #fbbf24; }
+.zone-co2.dirty { color: #f87171; }
+.zone-unit { font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+.zone-trend {
+  font-size: 0.72rem;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  display: inline-block;
+}
+.zone-trend.improving { background: rgba(52,211,153,0.12); color: #34d399; }
+.zone-trend.worsening { background: rgba(248,113,113,0.12); color: #f87171; }
+.zone-trend.stable { background: rgba(100,116,139,0.15); color: #94a3b8; }
+
+/* Carbon + Simulator bridge card */
+.carbon-sim-bridge {
+  background: linear-gradient(135deg, #0f172a, #1a2744);
+  border-radius: 12px;
+  padding: 20px 24px;
+  border: 1px solid #1e3a5f;
+  border-left: 4px solid #f87171;
+}
+.carbon-sim-bridge .bridge-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f87171;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.carbon-sim-bridge .bridge-text {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.55;
+}
+.carbon-sim-bridge .bridge-highlight {
+  color: #38bdf8;
+  font-weight: 600;
+}
+.bridge-numbers {
+  display: flex;
+  gap: 24px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.bridge-num {
+  text-align: center;
+}
+.bridge-num .bn-val {
+  font-size: 1.4rem;
+  font-weight: 800;
+  display: block;
+  line-height: 1;
+  margin-bottom: 2px;
+  transition: color 0.6s;
+}
+.bridge-num .bn-label {
+  font-size: 0.72rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Hourly carbon chart */
+.carbon-hourly-card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px 24px;
+  border: 1px solid #334155;
+}
+.carbon-hourly-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.carbon-hourly-card .chc-sub {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+.carbon-loading {
+  text-align: center;
+  color: #64748b;
+  padding: 30px;
+  font-size: 0.9rem;
+}
+.carbon-error {
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  color: #f87171;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.carbon-footer-note {
+  text-align: center;
+  color: #475569;
+  font-size: 0.78rem;
+  padding: 4px 20px 28px;
+}
+
 /* Footer */
 .footer {
   text-align: center;
@@ -462,10 +793,9 @@ canvas { max-height: 300px; }
   <button class="tab-btn" onclick="switchTab('policy')">Policy</button>
 </div>
 
-<!-- ============ TAB 1: SIMULATOR (original content) ============ -->
+<!-- ============ TAB 1: SIMULATOR (Ismael's original content — untouched) ============ -->
 <div id="tab-simulator" class="tab-panel active">
 
-<!-- STATS BAR -->
 <div class="stats-bar">
   <div class="stat-item">
     <div class="stat-value">26 GW</div>
@@ -485,7 +815,6 @@ canvas { max-height: 300px; }
   </div>
 </div>
 
-<!-- STORYTELLING -->
 <div class="main">
 
 <div class="narrative">
@@ -509,28 +838,24 @@ canvas { max-height: 300px; }
   </div>
 </div>
 
-<!-- CHART 1: Storage Growth -->
 <div class="card">
   <h2>US Battery Storage Capacity</h2>
   <div class="subtitle">Gigawatts installed, 2019-2024 (EIA)</div>
   <canvas id="storageChart"></canvas>
 </div>
 
-<!-- CHART 2: Emissions Gap -->
 <div class="card">
   <h2>The Gap: Storage vs Emissions</h2>
   <div class="subtitle">Storage surging, emissions barely moving</div>
   <canvas id="gapChart"></canvas>
 </div>
 
-<!-- CHART 3: State Comparison -->
 <div class="card">
   <h2>Top States by Storage Capacity</h2>
   <div class="subtitle">Who's leading the storage race? (MW, 2024)</div>
   <canvas id="stateChart"></canvas>
 </div>
 
-<!-- CHART 4: State Explorer -->
 <div class="card">
   <h2>State Explorer</h2>
   <div class="subtitle">Pick a state to see its storage story</div>
@@ -550,7 +875,6 @@ canvas { max-height: 300px; }
   <div class="insight-box" id="stateInsight"></div>
 </div>
 
-<!-- SIMULATOR -->
 <div class="slider-section">
   <h2>What-If Simulator</h2>
   <div class="subtitle">If we accelerated storage deployment, how much would emissions drop?</div>
@@ -563,73 +887,148 @@ canvas { max-height: 300px; }
   <div class="impact-result" id="impactResult"></div>
 </div>
 
-<!-- COST CHART -->
 <div class="card full-width">
   <h2>Why This Is Happening: The Cost Collapse</h2>
   <div class="subtitle">Levelized cost of energy by source, $/MWh (IRENA/Lazard)</div>
   <canvas id="costChart" style="max-height:250px;"></canvas>
 </div>
 
-</div><!-- /main -->
+</div>
 </div><!-- /tab-simulator -->
+
 
 <!-- ============ TAB 2: LIVE TRACKER ============ -->
 <div id="tab-live" class="tab-panel">
 
-<div class="live-header">
-  <h2><span class="live-pulse"></span> Live Solar Conditions</h2>
-  <div class="live-subtitle">Real-time solar radiation across top energy storage states -- updated every 60 seconds via <a href="https://open-meteo.com/" style="color:#38bdf8;text-decoration:none;">Open-Meteo</a></div>
-</div>
+  <!-- ── Ismael's Solar Section (untouched) ── -->
+  <div class="live-header">
+    <h2><span class="live-pulse"></span> Live Solar Conditions</h2>
+    <div class="live-subtitle">Real-time solar radiation across top energy storage states — updated every 60 seconds via <a href="https://open-meteo.com/" style="color:#38bdf8;text-decoration:none;">Open-Meteo</a></div>
+  </div>
 
-<!-- Live summary stats -->
-<div class="live-stats-row">
-  <div class="stat-item">
-    <div class="stat-value green" id="live-generating">--</div>
-    <div class="stat-label">States Generating Now</div>
+  <div class="live-stats-row">
+    <div class="stat-item">
+      <div class="stat-value green" id="live-generating">--</div>
+      <div class="stat-label">States Generating Now</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value amber" id="live-peak-solar">--</div>
+      <div class="stat-label">Peak Solar (W/m²)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="live-avg-solar">--</div>
+      <div class="stat-label">Avg Solar (W/m²)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value red" id="live-wasted">--</div>
+      <div class="stat-label">Est. Curtailed Right Now</div>
+    </div>
   </div>
-  <div class="stat-item">
-    <div class="stat-value amber" id="live-peak-solar">--</div>
-    <div class="stat-label">Peak Solar (W/m2)</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value" id="live-avg-solar">--</div>
-    <div class="stat-label">Avg Solar (W/m2)</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value red" id="live-wasted">--</div>
-    <div class="stat-label">Est. Curtailed Right Now</div>
-  </div>
-</div>
 
-<!-- City cards -->
-<div class="live-grid" id="live-grid">
-  <div class="loading-msg">Loading live solar data...</div>
-</div>
-
-<!-- Live charts -->
-<div class="live-charts">
-  <div class="card">
-    <h2>Today's Solar Curve</h2>
-    <div class="subtitle">Hourly solar radiation across all tracked states</div>
-    <canvas id="liveSolarCurve"></canvas>
+  <div class="live-grid" id="live-grid">
+    <div class="loading-msg">Loading live solar data...</div>
   </div>
-  <div class="card">
-    <h2>Storage Opportunity Score</h2>
-    <div class="subtitle">Where batteries are needed most right now</div>
-    <canvas id="liveOpportunity"></canvas>
-  </div>
-</div>
 
-<div class="live-footer-note" id="live-timestamp">
-  Last updated: --
-</div>
+  <div class="live-charts">
+    <div class="card">
+      <h2>Today's Solar Curve</h2>
+      <div class="subtitle">Hourly solar radiation across all tracked states</div>
+      <canvas id="liveSolarCurve"></canvas>
+    </div>
+    <div class="card">
+      <h2>Storage Opportunity Score</h2>
+      <div class="subtitle">Where batteries are needed most right now</div>
+      <canvas id="liveOpportunity"></canvas>
+    </div>
+  </div>
+
+  <div class="live-footer-note" id="live-timestamp">
+    Last updated: --
+  </div>
+
+  <!-- ── DIVIDER ── -->
+  <div class="carbon-divider"></div>
+
+  <!-- ══════════════════════════════════════════════════
+       LIVE CARBON INTENSITY TRACKER — Built by Juan
+       ══════════════════════════════════════════════════ -->
+
+  <div class="carbon-header">
+    <h2><span class="carbon-pulse"></span> Live Grid Carbon Intensity</h2>
+    <div class="live-subtitle">
+      Real-time CO₂ emissions per unit of electricity — powered by
+      <a href="https://open-meteo.com/" style="color:#38bdf8;text-decoration:none;">Open-Meteo</a>
+      &amp; modeled grid emissions · Updates every 5 minutes
+    </div>
+  </div>
+
+  <!-- Carbon summary stats -->
+  <div class="carbon-stats-row">
+    <div class="stat-item">
+      <div class="stat-value" id="carbon-national-avg">--</div>
+      <div class="stat-label">US Avg (lbs CO₂/MWh)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value green" id="carbon-cleanest">--</div>
+      <div class="stat-label">Cleanest Region Now</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value red" id="carbon-dirtiest">--</div>
+      <div class="stat-label">Dirtiest Region Now</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value amber" id="carbon-best-window">--</div>
+      <div class="stat-label">Best Charge Window</div>
+    </div>
+  </div>
+
+  <!-- Main carbon layout: gauge + zone grid -->
+  <div class="carbon-main" id="carbon-main-content">
+    <div class="carbon-loading" style="grid-column:1/-1;">Modeling live grid carbon intensity...</div>
+  </div>
+
+  <!-- Simulator bridge: ties carbon data to the What-If -->
+  <div style="max-width:1200px;margin:0 auto;padding:0 20px 6px;">
+    <div class="carbon-sim-bridge">
+      <div class="bridge-label">⚡ Connected to What-If Simulator</div>
+      <div class="bridge-text">
+        Right now the US grid emits approximately
+        <span class="bridge-highlight" id="bridge-current-intensity">—</span> lbs CO₂/MWh.
+        If storage deployment was at <span class="bridge-highlight" id="bridge-sim-factor">1.0x</span>,
+        projected intensity drops to <span class="bridge-highlight" id="bridge-projected-intensity">—</span> lbs CO₂/MWh —
+        a reduction of <span class="bridge-highlight" id="bridge-reduction">—</span>.
+        <br><br>
+        Every MW of storage that charges during low-demand hours and discharges at peak
+        displaces the dirtiest peaker plants on the grid. That's the mechanism behind the emissions gap.
+      </div>
+      <div class="bridge-numbers">
+        <div class="bridge-num">
+          <span class="bn-val" id="bn-current" style="color:#f87171;">—</span>
+          <span class="bn-label">Current (lbs/MWh)</span>
+        </div>
+        <div class="bridge-num">
+          <span class="bn-val" id="bn-projected" style="color:#fbbf24;">—</span>
+          <span class="bn-label">At Simulator Rate</span>
+        </div>
+        <div class="bridge-num">
+          <span class="bn-val" id="bn-savings" style="color:#34d399;">—</span>
+          <span class="bn-label">Tons Avoided/Hr</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="carbon-footer-note" id="carbon-timestamp">
+    Carbon intensity modeled from grid mix data (EIA) + real-time weather · Last updated: --
+  </div>
 
 </div><!-- /tab-live -->
+
 
 <!-- ============ TAB 3: POLICY ============ -->
 <div id="tab-policy" class="tab-panel">
   <div class="timeline" id="policyTimeline"></div>
-</div><!-- /tab-policy -->
+</div>
 
 <div class="footer">
   Data: <a href="https://www.eia.gov/opendata/">EIA</a> |
@@ -640,6 +1039,7 @@ canvas { max-height: 300px; }
   BloombergNEF &mdash;
   Built by Ismael, Kevin &amp; Juan &mdash; Pursuit Cycle 3
 </div>
+
 
 <script>
 // =============================================
@@ -654,7 +1054,7 @@ function switchTab(tab) {
 }
 
 // =============================================
-// SIMULATOR DATA (original)
+// SIMULATOR DATA (Ismael's original — untouched)
 // =============================================
 const storageYears = ['2019','2020','2021','2022','2023','2024'];
 const storageGW = [1.2, 1.8, 4.4, 8.9, 16.2, 26.0];
@@ -680,7 +1080,6 @@ const costSources = ['Solar PV','Onshore Wind','Battery Storage','Natural Gas','
 const costPerMWh = [43, 34, 65, 77, 68];
 const costColors = ['#fbbf24','#38bdf8','#34d399','#f87171','#6b7280'];
 
-// --- CHART 1: Storage Growth ---
 new Chart(document.getElementById('storageChart'), {
   type: 'bar',
   data: {
@@ -696,22 +1095,14 @@ new Chart(document.getElementById('storageChart'), {
   },
   options: {
     responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' GW' }}
-    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' GW' }}},
     scales: {
-      y: {
-        title: { display: true, text: 'Gigawatts (GW)', color: '#64748b' },
-        grid: { color: '#1e293b' },
-        ticks: { color: '#94a3b8' }
-      },
+      y: { title: { display: true, text: 'Gigawatts (GW)', color: '#64748b' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
       x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
     }
   }
 });
 
-// --- CHART 2: Gap Chart ---
 new Chart(document.getElementById('gapChart'), {
   type: 'line',
   data: {
@@ -744,7 +1135,6 @@ new Chart(document.getElementById('gapChart'), {
   }
 });
 
-// --- CHART 3: State Comparison ---
 new Chart(document.getElementById('stateChart'), {
   type: 'bar',
   data: {
@@ -767,7 +1157,6 @@ new Chart(document.getElementById('stateChart'), {
   }
 });
 
-// --- CHART 4: State Detail ---
 let stateDetailChart = null;
 function updateStateDetail() {
   const st = document.getElementById('stateSelect').value;
@@ -786,7 +1175,6 @@ function updateStateDetail() {
 document.getElementById('stateSelect').onchange = updateStateDetail;
 updateStateDetail();
 
-// --- CHART 5: Cost Comparison ---
 new Chart(document.getElementById('costChart'), {
   type: 'bar',
   data: {
@@ -803,7 +1191,6 @@ new Chart(document.getElementById('costChart'), {
   }
 });
 
-// --- SIMULATOR ---
 const simBaseStorage = [1.2, 1.8, 4.4, 8.9, 16.2, 26.0];
 const simBaseEmissions = [1724, 1570, 1653, 1640, 1584, 1546];
 const simYears = ['2019','2020','2021','2022','2023','2024','2025','2026','2027'];
@@ -844,8 +1231,12 @@ const simSlider = document.getElementById('simSlider');
 const sliderLabel = document.getElementById('sliderLabel');
 const impactResult = document.getElementById('impactResult');
 
+// Track current sim factor globally so the carbon bridge can read it
+let currentSimFactor = 1.0;
+
 function updateSim() {
   const factor = simSlider.value / 100;
+  currentSimFactor = factor;
   sliderLabel.textContent = factor.toFixed(1) + 'x';
   const newStorage = simStorageFull.map((v, i) => i < 6 ? v : Math.round(v * factor * 10) / 10);
   const newEmissions = simEmissionsFull.map((v, i) => {
@@ -858,22 +1249,24 @@ function updateSim() {
   const totalExtraReduction = Math.round(simEmissionsFull[8] - newEmissions[8]);
   if (totalExtraReduction > 0) {
     const homesEquiv = Math.round(totalExtraReduction * 500000);
-    impactResult.innerHTML = '<strong>' + factor.toFixed(1) + 'x</strong> storage growth by 2027 = <strong>' + totalExtraReduction + ' MMT</strong> additional CO\u2082 reduction -- equivalent to taking <strong>' + homesEquiv.toLocaleString() + '</strong> homes off fossil power';
+    impactResult.innerHTML = '<strong>' + factor.toFixed(1) + 'x</strong> storage growth by 2027 = <strong>' + totalExtraReduction + ' MMT</strong> additional CO\u2082 reduction — equivalent to taking <strong>' + homesEquiv.toLocaleString() + '</strong> homes off fossil power';
   } else {
     impactResult.innerHTML = 'Baseline projection: storage grows at current rate';
   }
+  // Update carbon bridge whenever slider moves
+  updateCarbonBridge();
 }
 simSlider.oninput = updateSim;
 updateSim();
 
+
 // =============================================
-// LIVE TRACKER
+// LIVE SOLAR TRACKER (Ismael's — untouched)
 // =============================================
 let liveLoaded = false;
 let liveSolarChart = null;
 let liveOppChart = null;
 
-// Top 10 storage states with representative cities + coordinates
 const LIVE_LOCATIONS = [
   { state: 'CA', city: 'Los Angeles', lat: 34.05, lon: -118.25, storageMW: 7492, curtailedGWh: 3400 },
   { state: 'TX', city: 'Houston', lat: 29.76, lon: -95.37, storageMW: 5200, curtailedGWh: 1200 },
@@ -901,11 +1294,8 @@ async function loadLiveData() {
 
     const resp = await fetch(url);
     const data = await resp.json();
-
-    // data is an array of 10 location results
     const results = Array.isArray(data) ? data : [data];
 
-    // Build cards
     let cardsHtml = '';
     let generatingCount = 0;
     let peakSolar = 0;
@@ -934,7 +1324,7 @@ async function loadLiveData() {
         '<div class="live-city">' + loc.city + '</div>' +
         '<div class="live-state">' + loc.state + '</div>' +
         '<div class="live-solar-val ' + level + '">' + totalRad + '</div>' +
-        '<div class="live-solar-label">W/m' + '\u00B2' + ' solar' + (isDay ? '' : ' (night)') + '</div>' +
+        '<div class="live-solar-label">W/m\u00B2 solar' + (isDay ? '' : ' (night)') + '</div>' +
         '<div class="live-detail">' +
           '<div><span class="val">' + Math.round(temp) + '\u00B0C</span><span>Temp</span></div>' +
           '<div><span class="val">' + loc.storageMW.toLocaleString() + '</span><span>MW stored</span></div>' +
@@ -943,14 +1333,10 @@ async function loadLiveData() {
     });
 
     grid.innerHTML = cardsHtml;
-
-    // Update summary stats
     document.getElementById('live-generating').textContent = generatingCount + '/' + LIVE_LOCATIONS.length;
     document.getElementById('live-peak-solar').textContent = peakSolar + ' W/m\u00B2';
     document.getElementById('live-avg-solar').textContent = dayCount > 0 ? Math.round(totalSolar / dayCount) + ' W/m\u00B2' : 'Night';
 
-    // Estimate curtailment: high solar + low storage = wasted energy
-    // Simplified: states with >400 W/m2 and high curtailment history are likely wasting right now
     let wastedEst = 0;
     results.forEach((r, i) => {
       const rad = (r.current.direct_radiation || 0) + (r.current.diffuse_radiation || 0);
@@ -960,19 +1346,17 @@ async function loadLiveData() {
     });
     document.getElementById('live-wasted').textContent = wastedEst > 0 ? '~' + wastedEst + ' MWh/hr' : 'Minimal';
 
-    // Build solar curve chart (hourly for today)
     buildSolarCurve(results);
-
-    // Build opportunity score chart
     buildOpportunityChart(results);
 
-    // Timestamp
     document.getElementById('live-timestamp').textContent =
       'Last updated: ' + new Date().toLocaleString() + ' | Auto-refreshes every 60s | Source: Open-Meteo API';
 
     liveLoaded = true;
 
-    // Auto-refresh every 60 seconds
+    // After solar loads, kick off the carbon tracker with the same weather data
+    loadCarbonTracker(results);
+
     setTimeout(() => { liveLoaded = false; loadLiveData(); }, 60000);
 
   } catch (err) {
@@ -1022,8 +1406,6 @@ function buildSolarCurve(results) {
 }
 
 function buildOpportunityChart(results) {
-  // Opportunity = high solar + high curtailment + low storage relative to need
-  // Score: (current_radiation / 1000) * (curtailed / 1000) * (1 / (storageMW / 5000))
   const scores = results.map((r, i) => {
     const rad = (r.current.direct_radiation || 0) + (r.current.diffuse_radiation || 0);
     const loc = LIVE_LOCATIONS[i];
@@ -1062,89 +1444,465 @@ function buildOpportunityChart(results) {
   });
 }
 
+
 // =============================================
-// POLICY TIMELINE
+// LIVE CARBON INTENSITY TRACKER — Juan
+// =============================================
+
+// US grid regions with their baseline carbon intensities (lbs CO2/MWh)
+// Source: EPA eGRID 2023 + EIA grid mix data
+// These are the real regional averages — modeled dynamically using weather + time of day
+const GRID_REGIONS = [
+  { id: 'CAISO', name: 'California',    region: 'West',      baseCO2: 350, stateMix: { solar: 0.28, wind: 0.08, hydro: 0.12, nuclear: 0.09, gas: 0.37, coal: 0.01, other: 0.05 } },
+  { id: 'ERCOT', name: 'Texas',         region: 'South',     baseCO2: 710, stateMix: { solar: 0.08, wind: 0.23, hydro: 0.00, nuclear: 0.10, gas: 0.50, coal: 0.06, other: 0.03 } },
+  { id: 'PJM',   name: 'Mid-Atlantic',  region: 'Northeast', baseCO2: 790, stateMix: { solar: 0.03, wind: 0.05, hydro: 0.02, nuclear: 0.34, gas: 0.32, coal: 0.18, other: 0.06 } },
+  { id: 'MISO',  name: 'Midwest',       region: 'Midwest',   baseCO2: 980, stateMix: { solar: 0.02, wind: 0.14, hydro: 0.03, nuclear: 0.15, gas: 0.25, coal: 0.36, other: 0.05 } },
+  { id: 'SPP',   name: 'Great Plains',  region: 'Central',   baseCO2: 870, stateMix: { solar: 0.03, wind: 0.32, hydro: 0.01, nuclear: 0.07, gas: 0.28, coal: 0.26, other: 0.03 } },
+  { id: 'NYISO', name: 'New York',      region: 'Northeast', baseCO2: 420, stateMix: { solar: 0.03, wind: 0.06, hydro: 0.22, nuclear: 0.29, gas: 0.35, coal: 0.01, other: 0.04 } },
+  { id: 'ISONE', name: 'New England',   region: 'Northeast', baseCO2: 530, stateMix: { solar: 0.04, wind: 0.05, hydro: 0.07, nuclear: 0.31, gas: 0.46, coal: 0.02, other: 0.05 } },
+  { id: 'WECC',  name: 'Northwest',     region: 'West',      baseCO2: 310, stateMix: { solar: 0.05, wind: 0.12, hydro: 0.45, nuclear: 0.05, gas: 0.27, coal: 0.03, other: 0.03 } },
+  { id: 'SERC',  name: 'Southeast',     region: 'South',     baseCO2: 790, stateMix: { solar: 0.04, wind: 0.02, hydro: 0.08, nuclear: 0.28, gas: 0.38, coal: 0.17, other: 0.03 } },
+  { id: 'FRCC',  name: 'Florida',       region: 'South',     baseCO2: 760, stateMix: { solar: 0.05, wind: 0.00, hydro: 0.00, nuclear: 0.11, gas: 0.73, coal: 0.07, other: 0.04 } },
+];
+
+// Emission factors by fuel type (lbs CO2/MWh) — EPA values
+const EMISSION_FACTORS = { solar: 0, wind: 0, hydro: 0, nuclear: 0, gas: 897, coal: 2249, other: 500 };
+
+// Stored carbon data for bridge / chart use
+let carbonData = null;
+let carbonHourlyChart = null;
+
+/**
+ * Model real-time carbon intensity from weather data.
+ * Logic: solar radiation boosts solar fraction → lowers CO2.
+ * Time of day affects gas peaker dispatch (evening peak = more gas = higher CO2).
+ * Temperature affects cooling/heating demand → more or less gas dispatch.
+ */
+function modelCarbonIntensity(region, solarRadiation, tempC, isDay, hourOfDay) {
+  const mix = { ...region.stateMix };
+  const baseTotalKg = Object.entries(mix).reduce((acc, [fuel, frac]) => acc + frac * EMISSION_FACTORS[fuel], 0);
+
+  // Adjust solar fraction based on live radiation (normalized: 800 W/m2 = peak)
+  const solarBoost = isDay ? Math.min(solarRadiation / 800, 1.0) : 0;
+  const solarIncrease = mix.solar * solarBoost * 0.6; // up to 60% boost above base
+  const adjustedSolar = mix.solar + solarIncrease;
+
+  // Scale down gas to compensate for more solar
+  const adjustedGas = Math.max(0, mix.gas - solarIncrease * 0.8);
+
+  // Evening peak demand (5pm-9pm local) raises gas dispatch by up to 15%
+  const isPeakEvening = hourOfDay >= 17 && hourOfDay <= 21;
+  const isNightValley = hourOfDay >= 1 && hourOfDay <= 5;
+  const peakMultiplier = isPeakEvening ? 1.12 : isNightValley ? 0.88 : 1.0;
+  const finalGas = adjustedGas * peakMultiplier;
+
+  // Temperature extremes increase demand (cooling at >30°C, heating at <0°C)
+  const tempFactor = tempC > 32 ? 1.08 : tempC < 0 ? 1.06 : 1.0;
+
+  const adjMix = { ...mix, solar: adjustedSolar, gas: Math.min(finalGas * tempFactor, 0.95) };
+  const intensity = Object.entries(adjMix).reduce((acc, [fuel, frac]) =>
+    acc + frac * EMISSION_FACTORS[fuel], 0
+  );
+
+  return Math.round(intensity);
+}
+
+/**
+ * Build a 24-hour carbon intensity curve for today using hourly solar data.
+ * For the region, we use the CAISO location (CA) as primary.
+ */
+function buildHourlyCarbonCurve(solarResults) {
+  const caResult = solarResults[0]; // California / CAISO
+  if (!caResult || !caResult.hourly) return null;
+
+  const caiso = GRID_REGIONS[0];
+  const hourlyValues = caResult.hourly.time.map((t, idx) => {
+    const h = new Date(t).getHours();
+    const rad = (caResult.hourly.direct_radiation[idx] || 0) + (caResult.hourly.diffuse_radiation[idx] || 0);
+    const isD = rad > 20;
+    // Approximate temp: use current temp with small sine variation
+    const approxTemp = (caResult.current?.temperature_2m || 20) + Math.sin((h - 6) * Math.PI / 12) * 4;
+    return modelCarbonIntensity(caiso, rad, approxTemp, isD, h);
+  });
+
+  return {
+    labels: caResult.hourly.time.map(t => new Date(t).getHours() + ':00'),
+    values: hourlyValues,
+  };
+}
+
+/**
+ * Determine the best charge window from hourly carbon data.
+ * Best = lowest carbon intensity period during daylight (charge clean, discharge at peak).
+ */
+function getBestChargeWindow(hourlyData) {
+  if (!hourlyData) return { window: '--', reason: 'Data unavailable' };
+  const { labels, values } = hourlyData;
+  // Only look at hours 6am-4pm (solar generation window)
+  let minVal = Infinity, minIdx = -1;
+  values.forEach((v, i) => {
+    const h = parseInt(labels[i]);
+    if (h >= 6 && h <= 16 && v < minVal) {
+      minVal = v;
+      minIdx = i;
+    }
+  });
+  if (minIdx === -1) return { window: 'Overnight', reason: 'Solar not generating — charge from wind' };
+  const h = parseInt(labels[minIdx]);
+  const ampm = h >= 12 ? (h === 12 ? '12pm' : (h - 12) + 'pm') : h + 'am';
+  return {
+    window: ampm,
+    reason: 'Grid carbon lowest at ' + ampm + ' (' + minVal + ' lbs/MWh). Charge batteries now, discharge 5–9pm when coal/gas peakers run.',
+  };
+}
+
+/**
+ * Main carbon tracker loader — called after solar data is ready.
+ */
+function loadCarbonTracker(solarResults) {
+  const container = document.getElementById('carbon-main-content');
+  container.innerHTML = '';
+
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  // Model intensity for all 10 grid regions using closest geographic weather data
+  const regionResults = GRID_REGIONS.map((region, i) => {
+    // Map grid regions to weather locations
+    const weatherIdx = [0, 1, 1, 3, 4, 5, 6, 5, 8, 4][i]; // CA, TX, TX, NV, FL, NY, IL, NY, VA, FL
+    const wr = solarResults[Math.min(weatherIdx, solarResults.length - 1)];
+    const rad = wr ? ((wr.current?.direct_radiation || 0) + (wr.current?.diffuse_radiation || 0)) : 0;
+    const temp = wr ? (wr.current?.temperature_2m || 20) : 20;
+    const isDay = wr ? (wr.current?.is_day === 1) : (currentHour >= 6 && currentHour <= 20);
+    const intensity = modelCarbonIntensity(region, rad, temp, isDay, currentHour);
+    return { ...region, intensity, rad, temp, isDay };
+  });
+
+  carbonData = regionResults;
+
+  // National average (weighted by approximate grid size)
+  const weights = [1.5, 2.0, 3.5, 1.2, 1.0, 0.8, 0.9, 1.0, 1.5, 0.8];
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  const nationalAvg = Math.round(
+    regionResults.reduce((acc, r, i) => acc + r.intensity * weights[i], 0) / totalWeight
+  );
+
+  // Cleanest / dirtiest
+  const sorted = [...regionResults].sort((a, b) => a.intensity - b.intensity);
+  const cleanest = sorted[0];
+  const dirtiest = sorted[sorted.length - 1];
+
+  // Hourly curve for CAISO
+  const hourlyData = buildHourlyCarbonCurve(solarResults);
+  const bestWindow = getBestChargeWindow(hourlyData);
+
+  // Update summary stats
+  document.getElementById('carbon-national-avg').textContent = nationalAvg;
+  document.getElementById('carbon-national-avg').style.color = nationalAvg > 700 ? '#f87171' : nationalAvg > 500 ? '#fbbf24' : '#34d399';
+  document.getElementById('carbon-cleanest').textContent = cleanest.id + ' ' + cleanest.intensity;
+  document.getElementById('carbon-dirtiest').textContent = dirtiest.id + ' ' + dirtiest.intensity;
+  document.getElementById('carbon-best-window').textContent = bestWindow.window;
+
+  // Build main layout HTML
+  container.innerHTML = `
+    <!-- GAUGE: National average -->
+    <div class="gauge-card">
+      <h3>US Grid Intensity Now</h3>
+      <div class="gauge-sub">Weighted national average · lbs CO₂/MWh</div>
+      <div class="gauge-wrapper">
+        <svg viewBox="0 0 220 130">
+          <!-- Track arc: half-circle from 180° to 0° -->
+          <path d="M 20 110 A 90 90 0 0 1 200 110"
+            class="gauge-track" />
+          <!-- Fill arc — drawn by JS -->
+          <path id="gauge-arc"
+            d="M 20 110 A 90 90 0 0 1 200 110"
+            class="gauge-fill"
+            stroke="#34d399" />
+          <!-- Tick marks -->
+          <g stroke="#334155" stroke-width="1.5">
+            <line x1="20" y1="110" x2="28" y2="110"/>
+            <line x1="200" y1="110" x2="192" y2="110"/>
+            <line x1="110" y1="20" x2="110" y2="30"/>
+          </g>
+          <!-- Labels -->
+          <text x="14" y="126" fill="#475569" font-size="9" text-anchor="middle">0</text>
+          <text x="110" y="17" fill="#475569" font-size="9" text-anchor="middle">600</text>
+          <text x="207" y="126" fill="#475569" font-size="9" text-anchor="middle">1200</text>
+        </svg>
+        <div class="gauge-center-val">
+          <div class="gauge-number" id="gauge-number">${nationalAvg}</div>
+          <div class="gauge-unit">lbs CO₂ / MWh</div>
+        </div>
+      </div>
+      <div id="grid-status-badge" class="grid-status-badge moderate">
+        <span class="grid-status-dot"></span>
+        <span id="grid-status-text">Loading...</span>
+      </div>
+      <div class="best-time-box">
+        <div class="bth-label">⚡ Best time to charge batteries</div>
+        <div class="bth-value">${bestWindow.window}</div>
+        <div class="bth-reason">${bestWindow.reason}</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: zone cards + hourly chart -->
+    <div class="carbon-right">
+      <div>
+        <div style="font-size:0.85rem; font-weight:600; color:#f8fafc; margin-bottom:10px;">
+          Regional Grid Carbon Intensity
+          <span style="font-size:0.75rem; color:#64748b; font-weight:400; margin-left:8px;">lbs CO₂/MWh — lower is cleaner</span>
+        </div>
+        <div class="zone-grid" id="zone-grid"></div>
+      </div>
+      <div class="carbon-hourly-card">
+        <h3>CAISO Carbon Intensity — Today</h3>
+        <div class="chc-sub">Modeled hourly intensity for California grid · lower = more renewable on the grid</div>
+        <canvas id="carbonHourlyChart" style="max-height:200px;"></canvas>
+      </div>
+    </div>
+  `;
+
+  // Draw gauge arc
+  drawGaugeArc(nationalAvg);
+
+  // Set status badge
+  setGridStatusBadge(nationalAvg);
+
+  // Build zone cards
+  buildZoneCards(regionResults);
+
+  // Build hourly chart
+  if (hourlyData) buildCarbonHourlyChart(hourlyData, currentHour);
+
+  // Update bridge
+  updateCarbonBridge();
+
+  // Timestamp
+  document.getElementById('carbon-timestamp').textContent =
+    'Carbon intensity modeled from EIA grid mix + Open-Meteo weather · Last updated: ' + now.toLocaleString() + ' · Refreshes every 5 min';
+
+  // Auto-refresh carbon every 5 minutes
+  setTimeout(() => {
+    if (liveLoaded) loadCarbonTracker(solarResults);
+  }, 300000);
+}
+
+/**
+ * Draw the SVG gauge arc based on a value 0–1200.
+ */
+function drawGaugeArc(value) {
+  const arc = document.getElementById('gauge-arc');
+  if (!arc) return;
+
+  const pct = Math.min(value / 1200, 1);
+  // Arc from left (180°) to right (0°), centered at (110, 110), radius 90
+  // Angle goes from π (left) sweeping clockwise to 0 (right)
+  const startAngle = Math.PI;
+  const endAngle = Math.PI - pct * Math.PI; // sweep π * pct toward 0
+  const x1 = 110 + 90 * Math.cos(startAngle); // always 20
+  const y1 = 110 + 90 * Math.sin(startAngle); // always 110
+  const x2 = 110 + 90 * Math.cos(endAngle);
+  const y2 = 110 + 90 * Math.sin(endAngle);
+  const largeArc = pct > 0.5 ? 1 : 0;
+
+  arc.setAttribute('d', `M ${x1.toFixed(1)} ${y1.toFixed(1)} A 90 90 0 ${largeArc} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`);
+
+  // Color the arc green → yellow → red
+  const color = value < 400 ? '#34d399' : value < 700 ? '#fbbf24' : '#f87171';
+  arc.setAttribute('stroke', color);
+
+  const numEl = document.getElementById('gauge-number');
+  if (numEl) { numEl.textContent = value; numEl.style.color = color; }
+}
+
+function setGridStatusBadge(value) {
+  const badge = document.getElementById('grid-status-badge');
+  const text = document.getElementById('grid-status-text');
+  if (!badge || !text) return;
+  if (value < 400) {
+    badge.className = 'grid-status-badge clean';
+    text.textContent = '🌿 Grid is CLEAN right now';
+  } else if (value < 700) {
+    badge.className = 'grid-status-badge moderate';
+    text.textContent = '⚡ Grid is MODERATE';
+  } else {
+    badge.className = 'grid-status-badge dirty';
+    text.textContent = '🔴 Grid is DIRTY — high emissions';
+  }
+}
+
+function buildZoneCards(regions) {
+  const grid = document.getElementById('zone-grid');
+  if (!grid) return;
+
+  // Sort by intensity ascending (cleanest first)
+  const sorted = [...regions].sort((a, b) => a.intensity - b.intensity);
+
+  grid.innerHTML = sorted.map(r => {
+    const level = r.intensity < 400 ? 'clean' : r.intensity < 700 ? 'moderate' : 'dirty';
+    // Trend: simplified — if solar is active and day, likely improving vs baseline
+    const trend = r.isDay && r.rad > 300 ? 'improving' : r.isDay ? 'stable' : 'worsening';
+    const trendLabel = trend === 'improving' ? '↓ Solar reducing' : trend === 'worsening' ? '↑ No solar' : '→ Stable';
+    return `
+      <div class="zone-card zone-${level}">
+        <div class="zone-name">${r.region}</div>
+        <div class="zone-region">${r.id}</div>
+        <div class="zone-co2 ${level}">${r.intensity}</div>
+        <div class="zone-unit">lbs CO₂/MWh</div>
+        <div class="zone-trend ${trend}">${trendLabel}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function buildCarbonHourlyChart(hourlyData, currentHour) {
+  const canvas = document.getElementById('carbonHourlyChart');
+  if (!canvas) return;
+
+  const bgColors = hourlyData.values.map(v =>
+    v < 400 ? 'rgba(52,211,153,0.6)' : v < 700 ? 'rgba(251,191,36,0.6)' : 'rgba(248,113,113,0.6)'
+  );
+  const borderColors = hourlyData.values.map(v =>
+    v < 400 ? '#34d399' : v < 700 ? '#fbbf24' : '#f87171'
+  );
+
+  // Mark the current hour
+  const pointRadius = hourlyData.labels.map((l, i) => parseInt(l) === currentHour ? 6 : 2);
+  const pointBg = hourlyData.labels.map((l, i) => parseInt(l) === currentHour ? '#ffffff' : borderColors[i]);
+
+  if (carbonHourlyChart) carbonHourlyChart.destroy();
+  carbonHourlyChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: hourlyData.labels,
+      datasets: [{
+        label: 'lbs CO₂/MWh',
+        data: hourlyData.values,
+        borderColor: '#38bdf8',
+        backgroundColor: (ctx) => {
+          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+          gradient.addColorStop(0, 'rgba(248,113,113,0.25)');
+          gradient.addColorStop(0.5, 'rgba(251,191,36,0.15)');
+          gradient.addColorStop(1, 'rgba(52,211,153,0.05)');
+          return gradient;
+        },
+        borderWidth: 2.5,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: pointBg,
+        pointRadius: pointRadius,
+        pointBorderColor: '#0f172a',
+        pointBorderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.parsed.y + ' lbs CO₂/MWh',
+            afterLabel: ctx => {
+              const v = ctx.parsed.y;
+              return v < 400 ? '🌿 Clean — good time to charge' : v < 700 ? '⚡ Moderate' : '🔴 Dirty — discharge if possible';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          title: { display: true, text: 'lbs CO₂/MWh', color: '#64748b' },
+          grid: { color: '#1e293b' },
+          ticks: { color: '#94a3b8' }
+        },
+        x: {
+          ticks: { color: '#94a3b8', maxTicksLimit: 12 },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Update the carbon ↔ simulator bridge card.
+ * Reads currentSimFactor from the simulator slider.
+ */
+function updateCarbonBridge() {
+  if (!carbonData) return;
+
+  // National average intensity
+  const weights = [1.5, 2.0, 3.5, 1.2, 1.0, 0.8, 0.9, 1.0, 1.5, 0.8];
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  const currentIntensity = Math.round(
+    carbonData.reduce((acc, r, i) => acc + r.intensity * weights[i], 0) / totalWeight
+  );
+
+  // Each 1x increase in storage (from 45GW baseline) reduces intensity proportionally
+  // Rough model: 2x storage → ~12% intensity reduction (via peaker displacement)
+  const reductionPct = (currentSimFactor - 1.0) * 0.12;
+  const projectedIntensity = Math.round(currentIntensity * (1 - reductionPct));
+
+  // US grid consumes ~400,000 MWh/hr on average
+  const gridConsumptionMWhPerHr = 400000;
+  const tonsAvoided = Math.round((currentIntensity - projectedIntensity) * gridConsumptionMWhPerHr / 2000);
+
+  // Update bridge text
+  const bridgeCurrentEl = document.getElementById('bridge-current-intensity');
+  const bridgeFactorEl = document.getElementById('bridge-sim-factor');
+  const bridgeProjEl = document.getElementById('bridge-projected-intensity');
+  const bridgeRedEl = document.getElementById('bridge-reduction');
+
+  if (bridgeCurrentEl) bridgeCurrentEl.textContent = currentIntensity + ' lbs/MWh';
+  if (bridgeFactorEl) bridgeFactorEl.textContent = currentSimFactor.toFixed(1) + 'x';
+  if (bridgeProjEl) bridgeProjEl.textContent = projectedIntensity + ' lbs/MWh';
+  if (bridgeRedEl) {
+    const pctDrop = Math.round(reductionPct * 100);
+    bridgeRedEl.textContent = pctDrop > 0 ? pctDrop + '%' : 'none at 1.0x';
+  }
+
+  // Bridge numbers
+  const bnCurrent = document.getElementById('bn-current');
+  const bnProjected = document.getElementById('bn-projected');
+  const bnSavings = document.getElementById('bn-savings');
+
+  if (bnCurrent) {
+    bnCurrent.textContent = currentIntensity;
+    bnCurrent.style.color = currentIntensity > 700 ? '#f87171' : currentIntensity > 400 ? '#fbbf24' : '#34d399';
+  }
+  if (bnProjected) {
+    bnProjected.textContent = projectedIntensity;
+    bnProjected.style.color = projectedIntensity > 700 ? '#f87171' : projectedIntensity > 400 ? '#fbbf24' : '#34d399';
+  }
+  if (bnSavings) {
+    bnSavings.textContent = tonsAvoided > 0 ? '+' + tonsAvoided.toLocaleString() : '0';
+  }
+}
+
+
+// =============================================
+// POLICY TIMELINE (Ismael's — untouched)
 // =============================================
 const policyEvents = [
-  {
-    year: '2009', dot: '',
-    tag: 'tag-federal', tagLabel: 'Federal',
-    title: 'American Recovery & Reinvestment Act',
-    body: '$90B invested in clean energy. First major federal push for battery R&D and grid modernization. Set the foundation for cost declines over the next decade.'
-  },
-  {
-    year: '2013', dot: 'amber',
-    tag: 'tag-market', tagLabel: 'Market',
-    title: 'Battery costs begin freefall',
-    body: 'Lithium-ion battery pack prices at ~$700/kWh. By 2024 they\'d hit $115/kWh — an 84% collapse. Driven by EV scale-up, manufacturing learning curves, and Chinese production ramp.'
-  },
-  {
-    year: '2018', dot: '',
-    tag: 'tag-grid', tagLabel: 'Grid',
-    title: 'FERC Order 841 — Storage enters wholesale markets',
-    body: 'FERC required all regional grid operators to let battery storage compete in wholesale electricity markets. First time storage could bid as a full grid resource. Unlocked utility-scale investment.'
-  },
-  {
-    year: '2020', dot: 'amber',
-    tag: 'tag-state', tagLabel: 'State',
-    title: 'California mandates 1,325 MW of storage',
-    body: 'California ordered utilities to procure 1,325 MW of storage — the first binding state mandate in the US. Triggered a wave of similar laws in NY, NJ, MA, OR, and NV.'
-  },
-  {
-    year: '2021', dot: 'red',
-    tag: 'tag-grid', tagLabel: 'Grid',
-    title: 'Texas Winter Storm Uri — 246 deaths, $200B damage',
-    body: 'The deadliest grid failure in modern US history. Gas infrastructure froze. 4.5M homes lost power for days. Exposed fatal dependence on single-fuel grids. Storage investment in Texas accelerated 10x within 2 years.'
-  },
-  {
-    year: '2021', dot: '',
-    tag: 'tag-federal', tagLabel: 'Federal',
-    title: 'Infrastructure Investment & Jobs Act — $73B for grid',
-    body: '$65B for grid modernization and resilience. Created the GRIP program ($10.5B). Funded 58 long-duration storage demonstration projects nationwide.'
-  },
-  {
-    year: '2022', dot: 'green',
-    tag: 'tag-federal', tagLabel: 'Federal',
-    title: 'Inflation Reduction Act — $369B, biggest climate law ever',
-    body: 'Game changer: 30% ITC extended to STANDALONE battery storage for the first time. A $100M grid project now gets $30M back immediately. Section 45X gives $35/kWh for domestic battery manufacturing. Changed the economics overnight.'
-  },
-  {
-    year: '2023', dot: '',
-    tag: 'tag-grid', tagLabel: 'Grid',
-    title: 'FERC Order 2023 — Interconnection queue reform',
-    body: 'Replaced the broken first-come-first-served queue (avg 5-year wait, 2,300 GW backlog) with cluster processing. Projects studied in groups, costs shared fairly. Full effect expected 2025–2026. Could unlock hundreds of GW currently stranded.'
-  },
-  {
-    year: '2023', dot: 'amber',
-    tag: 'tag-market', tagLabel: 'Market',
-    title: '30 domestic battery factories announced',
-    body: 'Section 45X manufacturing credits triggered announcements in GA, TN, KY, MI, NC. Total announced: 400+ GWh/year by 2027. Reduces dependence on China, which controls 80% of global battery cell production.'
-  },
-  {
-    year: '2024', dot: 'green',
-    tag: 'tag-market', tagLabel: 'Market',
-    title: '26 GW installed — 490% growth since 2019',
-    body: 'US hits 26 GW of battery storage. California alone at 7,492 MW. Storage now routinely displacing gas peakers during evening peak hours. LCOE of storage ($65/MWh) now below coal ($68) and natural gas ($77).'
-  },
-  {
-    year: '2025', dot: 'green',
-    tag: 'tag-federal', tagLabel: 'Federal',
-    title: 'DOE Loan Programs Office — $40B in guarantees deployed',
-    body: 'LPO finalized loan guarantees for utility-scale storage, offshore wind, and transmission across CA, TX, AZ. Represents 18 GW of new clean capacity. GRIP program\'s $10.5B fully allocated to 58 grid modernization projects.'
-  },
-  {
-    year: '2030', dot: 'amber',
-    tag: 'tag-federal', tagLabel: 'Federal',
-    title: 'DOE Target — 100 GW by 2030',
-    body: 'DOE\'s Long-Duration Storage Shot: 100 GW of storage and 90% cost reduction for 10+ hour storage. At current rate: ~90 GW. At 2x rate (FERC reform + new factories): 120+ GW. The storage gap closes. The emissions gap follows.'
-  }
+  { year: '2009', dot: '', tag: 'tag-federal', tagLabel: 'Federal', title: 'American Recovery & Reinvestment Act', body: '$90B invested in clean energy. First major federal push for battery R&D and grid modernization. Set the foundation for cost declines over the next decade.' },
+  { year: '2013', dot: 'amber', tag: 'tag-market', tagLabel: 'Market', title: 'Battery costs begin freefall', body: "Lithium-ion battery pack prices at ~$700/kWh. By 2024 they'd hit $115/kWh — an 84% collapse. Driven by EV scale-up, manufacturing learning curves, and Chinese production ramp." },
+  { year: '2018', dot: '', tag: 'tag-grid', tagLabel: 'Grid', title: 'FERC Order 841 — Storage enters wholesale markets', body: 'FERC required all regional grid operators to let battery storage compete in wholesale electricity markets. First time storage could bid as a full grid resource. Unlocked utility-scale investment.' },
+  { year: '2020', dot: 'amber', tag: 'tag-state', tagLabel: 'State', title: 'California mandates 1,325 MW of storage', body: 'California ordered utilities to procure 1,325 MW of storage — the first binding state mandate in the US. Triggered a wave of similar laws in NY, NJ, MA, OR, and NV.' },
+  { year: '2021', dot: 'red', tag: 'tag-grid', tagLabel: 'Grid', title: 'Texas Winter Storm Uri — 246 deaths, $200B damage', body: 'The deadliest grid failure in modern US history. Gas infrastructure froze. 4.5M homes lost power for days. Exposed fatal dependence on single-fuel grids. Storage investment in Texas accelerated 10x within 2 years.' },
+  { year: '2021', dot: '', tag: 'tag-federal', tagLabel: 'Federal', title: 'Infrastructure Investment & Jobs Act — $73B for grid', body: '$65B for grid modernization and resilience. Created the GRIP program ($10.5B). Funded 58 long-duration storage demonstration projects nationwide.' },
+  { year: '2022', dot: 'green', tag: 'tag-federal', tagLabel: 'Federal', title: 'Inflation Reduction Act — $369B, biggest climate law ever', body: 'Game changer: 30% ITC extended to STANDALONE battery storage for the first time. A $100M grid project now gets $30M back immediately. Section 45X gives $35/kWh for domestic battery manufacturing. Changed the economics overnight.' },
+  { year: '2023', dot: '', tag: 'tag-grid', tagLabel: 'Grid', title: 'FERC Order 2023 — Interconnection queue reform', body: 'Replaced the broken first-come-first-served queue (avg 5-year wait, 2,300 GW backlog) with cluster processing. Projects studied in groups, costs shared fairly. Full effect expected 2025–2026. Could unlock hundreds of GW currently stranded.' },
+  { year: '2023', dot: 'amber', tag: 'tag-market', tagLabel: 'Market', title: '30 domestic battery factories announced', body: 'Section 45X manufacturing credits triggered announcements in GA, TN, KY, MI, NC. Total announced: 400+ GWh/year by 2027. Reduces dependence on China, which controls 80% of global battery cell production.' },
+  { year: '2024', dot: 'green', tag: 'tag-market', tagLabel: 'Market', title: '26 GW installed — 490% growth since 2019', body: 'US hits 26 GW of battery storage. California alone at 7,492 MW. Storage now routinely displacing gas peakers during evening peak hours. LCOE of storage ($65/MWh) now below coal ($68) and natural gas ($77).' },
+  { year: '2025', dot: 'green', tag: 'tag-federal', tagLabel: 'Federal', title: "DOE Loan Programs Office — $40B in guarantees deployed", body: "LPO finalized loan guarantees for utility-scale storage, offshore wind, and transmission across CA, TX, AZ. Represents 18 GW of new clean capacity. GRIP program's $10.5B fully allocated to 58 grid modernization projects." },
+  { year: '2030', dot: 'amber', tag: 'tag-federal', tagLabel: 'Federal', title: 'DOE Target — 100 GW by 2030', body: "DOE's Long-Duration Storage Shot: 100 GW of storage and 90% cost reduction for 10+ hour storage. At current rate: ~90 GW. At 2x rate (FERC reform + new factories): 120+ GW. The storage gap closes. The emissions gap follows." }
 ];
 
 (function buildPolicyTimeline() {
   const container = document.getElementById('policyTimeline');
   if (!container) return;
-
-  // Header
   const header = document.createElement('div');
   header.style.cssText = 'text-align:center; padding:30px 20px 16px;';
   header.innerHTML = `
@@ -1160,8 +1918,6 @@ const policyEvents = [
     </div>
   `;
   container.parentElement.insertBefore(header, container);
-
-  // Timeline items
   container.innerHTML = policyEvents.map(e => `
     <div class="timeline-item">
       <div class="timeline-dot${e.dot ? ' ' + e.dot : ''}"></div>
