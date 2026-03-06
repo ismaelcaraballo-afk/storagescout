@@ -19,9 +19,10 @@ const LIVE_LOCATIONS = [
 
 interface LiveTrackerProps {
   onIntensityUpdate: (intensity: number) => void;
+  onRegionsUpdate?: (regions: any[]) => void;
 }
 
-export default function LiveTracker({ onIntensityUpdate }: LiveTrackerProps) {
+export default function LiveTracker({ onIntensityUpdate, onRegionsUpdate }: LiveTrackerProps) {
   const [data, setData] = useState<CarbonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -217,7 +218,7 @@ export default function LiveTracker({ onIntensityUpdate }: LiveTrackerProps) {
 
       {/* Carbon Intensity Tracker */}
       <div className="mt-8 border-t border-white/[0.06] pt-8">
-        <CarbonIntensityTracker solarData={solarData} simFactor={simFactor} />
+        <CarbonIntensityTracker solarData={solarData} simFactor={simFactor} onRegionsUpdate={onRegionsUpdate} />
       </div>
     </motion.div>
   );

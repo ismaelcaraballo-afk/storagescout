@@ -15,6 +15,7 @@ import {
 interface CarbonTrackerProps {
   solarData?: any;
   simFactor?: number;
+  onRegionsUpdate?: (regions: any[]) => void;
 }
 
 const levelColors = {
@@ -23,7 +24,7 @@ const levelColors = {
   dirty: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', glow: 'rgba(248,113,113,0.3)' },
 };
 
-export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData, simFactor = 1.0 }) => {
+export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData, simFactor = 1.0, onRegionsUpdate }) => {
   const [carbonData, setCarbonData] = useState<any[]>([]);
   const [hourlyData, setHourlyData] = useState<any>(null);
   const [currentIntensity, setCurrentIntensity] = useState<number>(600);
@@ -63,6 +64,7 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
       }).filter(Boolean);
 
       setCarbonData(data);
+      onRegionsUpdate?.(data);
 
       const weights = [1.5, 2.0, 3.5, 1.2, 1.0, 0.8, 0.9, 1.0, 1.5, 0.8];
       const totalWeight = weights.reduce((a, b) => a + b, 0);

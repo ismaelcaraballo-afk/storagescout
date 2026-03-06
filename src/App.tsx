@@ -10,6 +10,8 @@ import LiveTracker from './components/LiveTracker';
 import Simulator from './components/Simulator';
 import { StorageGrowthChart, GapChart, StateChart, CostChart } from './components/Charts';
 import { STATE_DATA } from './data/staticData';
+import LiveTicker from './components/LiveTicker';
+import USHeatmap from './components/USHeatmap';
 
 /** Animated counter that counts up from 0 when scrolled into view */
 function AnimatedStat({ value, suffix = '', color }: { value: string; suffix?: string; color: string }) {
@@ -75,6 +77,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'live'>('dashboard');
   const [selectedState, setSelectedState] = useState(STATE_DATA[0]);
   const [currentIntensity, setCurrentIntensity] = useState(450);
+  const [liveRegions, setLiveRegions] = useState<any[]>([]);
 
   return (
     <div className="min-h-screen bg-[#060a13] text-slate-200 font-sans selection:bg-sky-500/30">
@@ -124,6 +127,9 @@ function App() {
             </span>
           </button>
         </nav>
+
+        {/* Live Ticker Banner */}
+        {liveRegions.length > 0 && <LiveTicker regions={liveRegions} />}
 
         <main className="max-w-7xl mx-auto px-4 py-8">
           {/* Stats Bar */}
@@ -246,7 +252,10 @@ function App() {
               animate={{ opacity: 1 }}
               className="space-y-8"
             >
-              <LiveTracker onIntensityUpdate={setCurrentIntensity} />
+              <LiveTracker onIntensityUpdate={setCurrentIntensity} onRegionsUpdate={setLiveRegions} />
+
+              {/* US Carbon Heatmap */}
+              {liveRegions.length > 0 && <USHeatmap regions={liveRegions} />}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <GlassCard className="p-6">
