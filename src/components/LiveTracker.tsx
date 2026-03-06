@@ -70,10 +70,37 @@ export default function LiveTracker({ onIntensityUpdate, onRegionsUpdate }: Live
 
   if (loading && !data) {
     return (
-      <div className="p-12 text-center">
-        <div className="inline-flex items-center gap-3 text-slate-400">
-          <RefreshCw size={18} className="animate-spin" />
-          Connecting to WattTime & Electricity Maps APIs...
+      <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 shadow-lg shadow-black/20 animate-pulse">
+        {/* Skeleton header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="h-6 w-48 bg-white/[0.06] rounded-lg mb-2" />
+            <div className="h-4 w-32 bg-white/[0.04] rounded-lg" />
+          </div>
+          <div className="h-8 w-8 bg-white/[0.06] rounded-full" />
+        </div>
+        {/* Skeleton cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] flex flex-col items-center justify-center h-48">
+            <div className="w-32 h-32 rounded-full bg-white/[0.06]" />
+          </div>
+          <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] space-y-4">
+            <div className="h-3 w-28 bg-white/[0.06] rounded" />
+            <div className="h-8 w-20 bg-white/[0.06] rounded" />
+            <div className="h-3 w-36 bg-white/[0.04] rounded" />
+            <div className="h-3 w-28 bg-white/[0.06] rounded" />
+            <div className="h-8 w-16 bg-white/[0.06] rounded" />
+          </div>
+          <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] space-y-4">
+            <div className="h-3 w-24 bg-white/[0.06] rounded" />
+            <div className="h-5 w-full bg-white/[0.06] rounded" />
+            <div className="h-3 w-full bg-white/[0.04] rounded" />
+            <div className="h-3 w-3/4 bg-white/[0.04] rounded" />
+          </div>
+        </div>
+        <div className="mt-6 text-center text-xs text-slate-600">
+          <RefreshCw size={14} className="inline animate-spin mr-2" />
+          Connecting to live data sources...
         </div>
       </div>
     );
