@@ -12,6 +12,7 @@ import { StorageGrowthChart, GapChart, StateChart, CostChart } from './component
 import { STATE_DATA } from './data/staticData';
 import LiveTicker from './components/LiveTicker';
 import USHeatmap from './components/USHeatmap';
+import { StorageScoutLogo } from './components/StorageScoutLogo';
 
 /** Animated counter that counts up from 0 when scrolled into view */
 function AnimatedStat({ value, suffix = '', color }: { value: string; suffix?: string; color: string }) {
@@ -97,6 +98,7 @@ function App() {
             transition={{ duration: 0.8 }}
             className="relative"
           >
+            <StorageScoutLogo size={80} className="mx-auto mb-3" />
             <h1 className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-400 mb-4 tracking-tight">
               StorageScout
             </h1>

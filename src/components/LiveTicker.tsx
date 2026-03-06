@@ -19,6 +19,19 @@ const levelColors = {
   dirty: 'text-red-400',
 };
 
+const regionLinks: Record<string, string> = {
+  CAISO: 'https://www.caiso.com/todaysoutlook',
+  ERCOT: 'https://www.ercot.com/gridmktinfo/dashboards',
+  PJM: 'https://www.pjm.com/markets-and-operations',
+  MISO: 'https://www.misoenergy.org/markets-and-operations/',
+  SPP: 'https://www.spp.org/markets-operations/',
+  NYISO: 'https://www.nyiso.com/real-time-dashboard',
+  ISONE: 'https://www.iso-ne.com/isoexpress/',
+  WECC: 'https://www.wecc.org/',
+  SERC: 'https://www.epa.gov/egrid/power-profiler#/SRSO',
+  FRCC: 'https://www.eia.gov/electricity/gridmonitor/dashboard/electric_overview/regional/REG-FLA',
+};
+
 const trendArrow = (r: TickerRegion) => {
   if (r.isDay && (r.rad || 0) > 300) return '↓';
   if (!r.isDay) return '↑';
@@ -87,7 +100,13 @@ export default function LiveTicker({ regions }: LiveTickerProps) {
               const arrow = trendArrow(r);
 
               return (
-                <span key={`${r.id}-${i}`} className="inline-flex items-center gap-2 text-xs">
+                <a
+                  key={`${r.id}-${i}`}
+                  href={regionLinks[r.id] || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs hover:bg-white/[0.05] px-2 py-1 rounded-md transition-colors cursor-pointer"
+                >
                   <span className="text-slate-500 font-medium">{r.id}</span>
                   <span className={`font-bold font-mono ${levelColors[level]}`}>
                     {r.intensity}
@@ -95,7 +114,7 @@ export default function LiveTicker({ regions }: LiveTickerProps) {
                   <span className={`${levelColors[level]} text-[10px]`}>{arrow}</span>
                   <span className="text-slate-600">lbs/MWh</span>
                   <span className="text-slate-700 ml-2">•</span>
-                </span>
+                </a>
               );
             })}
 
