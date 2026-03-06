@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { motion } from 'motion/react';
 import {
   GRID_REGIONS,
   CARBON_THRESHOLDS,
@@ -9,12 +10,18 @@ import {
   buildHourlyCarbonCurve,
   getBestChargeWindow,
   getGridStatus,
-} from './carbonModel';
+} from '../services/carbonModel';
 
 interface CarbonTrackerProps {
   solarData?: any;
   simFactor?: number;
 }
+
+const levelColors = {
+  clean: { text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', glow: 'rgba(52,211,153,0.3)' },
+  moderate: { text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', glow: 'rgba(251,191,36,0.3)' },
+  dirty: { text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', glow: 'rgba(248,113,113,0.3)' },
+};
 
 export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData, simFactor = 1.0 }) => {
   const [carbonData, setCarbonData] = useState<any[]>([]);
@@ -23,7 +30,6 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Calculate carbon intensity for all regions when solar data updates
   useEffect(() => {
     if (!solarData) {
       setLoading(false);
@@ -34,7 +40,6 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
       const now = new Date();
       const currentHour = now.getHours();
 
-      // Calculate intensity for each region
       const data = GRID_REGIONS.map((region, idx) => {
         const solarLoc = solarData[idx];
         if (!solarLoc?.current) return null;
@@ -59,7 +64,6 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
 
       setCarbonData(data);
 
-      // Calculate weighted national average
       const weights = [1.5, 2.0, 3.5, 1.2, 1.0, 0.8, 0.9, 1.0, 1.5, 0.8];
       const totalWeight = weights.reduce((a, b) => a + b, 0);
       const national = Math.round(
@@ -67,7 +71,6 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
       );
       setCurrentIntensity(national);
 
-      // Build hourly forecast
       if (solarData[0]?.hourly) {
         const hourly = buildHourlyCarbonCurve(solarData[0], 0);
         setHourlyData(hourly);
@@ -94,43 +97,51 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
   const bestWindow = getBestChargeWindow(hourlyData);
   const cleanest = [...carbonData].sort((a, b) => a.intensity - b.intensity)[0];
   const dirtiest = [...carbonData].sort((a, b) => b.intensity - a.intensity)[0];
+  const level = getCarbonLevel(currentIntensity);
+  const colors = levelColors[level];
 
   return (
-    <div className="carbon-tracker">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="carbon-header">
-        <h2>⚡ Live Grid Carbon Intensity</h2>
-        <p>Real-time CO₂ emissions per unit of electricity — Updates every 5 minutes</p>
+      <div>
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          ⚡ Live Grid Carbon Intensity
+        </h2>
+        <p className="text-slate-400 text-sm mt-1">Real-time CO₂ emissions per unit of electricity — Updates every 5 minutes</p>
       </div>
 
       {/* Summary Stats */}
-      <div className="carbon-stats">
-        <div className="stat-card">
-          <div className="stat-label">US Avg (lbs CO₂/MWh)</div>
-          <div className={`stat-value ${gridStatus.className}`}>{currentIntensity}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Cleanest Region Now</div>
-          <div className="stat-value green">{cleanest?.name} {cleanest?.intensity}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Dirtiest Region Now</div>
-          <div className="stat-value red">{dirtiest?.name} {dirtiest?.intensity}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Best Charge Window</div>
-          <div className="stat-value amber">{bestWindow.window}</div>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] text-center">
+          <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">US Avg (lbs CO₂/MWh)</div>
+          <div className={`text-2xl font-bold ${colors.text}`}>{currentIntensity}</div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] text-center">
+          <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">Cleanest Region Now</div>
+          <div className="text-lg font-bold text-emerald-400">{cleanest?.name}</div>
+          <div className="text-sm text-emerald-400/70">{cleanest?.intensity} lbs</div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] text-center">
+          <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">Dirtiest Region Now</div>
+          <div className="text-lg font-bold text-red-400">{dirtiest?.name}</div>
+          <div className="text-sm text-red-400/70">{dirtiest?.intensity} lbs</div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+          className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06] text-center">
+          <div className="text-xs text-slate-500 uppercase tracking-wider mb-2">Best Charge Window</div>
+          <div className="text-lg font-bold text-amber-400">{bestWindow.window}</div>
+          <div className="text-xs text-slate-500 mt-1">{bestWindow.reason}</div>
+        </motion.div>
       </div>
 
-      {/* Main Content */}
-      <div className="carbon-main">
-        {/* Gauge */}
+      {/* Gauge + Zones */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <CarbonGauge value={currentIntensity} />
-
-        {/* Zone Cards */}
-        <div className="carbon-zones">
-          <h3>Regional Grid Carbon Intensity</h3>
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-3">Regional Grid Carbon Intensity</h3>
           <CarbonZoneCards regions={carbonData} />
         </div>
       </div>
@@ -144,14 +155,12 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
   );
 };
 
-/**
- * SVG Gauge for carbon intensity visualization
- */
+/** SVG Gauge with glow effect */
 const CarbonGauge: React.FC<{ value: number }> = ({ value }) => {
   const level = getCarbonLevel(value);
   const color = CARBON_COLORS[level].solid;
+  const colors = levelColors[level];
 
-  // Arc path calculation (half-circle from 180° to 0°)
   const pct = Math.min(value / 1200, 1);
   const startAngle = Math.PI;
   const endAngle = Math.PI - pct * Math.PI;
@@ -164,72 +173,94 @@ const CarbonGauge: React.FC<{ value: number }> = ({ value }) => {
   const arcPath = `M ${x1.toFixed(1)} ${y1.toFixed(1)} A 90 90 0 ${largeArc} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
 
   return (
-    <div className="carbon-gauge">
-      <h3>US Grid Intensity Now</h3>
-      <div className="gauge-subtitle">Weighted national average · lbs CO₂/MWh</div>
-      <div className="gauge-container">
-        <svg viewBox="0 0 220 130" className="gauge-svg">
-          {/* Track arc */}
-          <path d="M 20 110 A 90 90 0 0 1 200 110" className="gauge-track" />
-          {/* Fill arc */}
-          <path d={arcPath} className="gauge-fill" stroke={color} />
-          {/* Tick marks */}
-          <line x1="20" y1="110" x2="28" y2="110" stroke="#334155" strokeWidth="1.5" />
-          <line x1="200" y1="110" x2="192" y2="110" stroke="#334155" strokeWidth="1.5" />
-          <line x1="110" y1="20" x2="110" y2="30" stroke="#334155" strokeWidth="1.5" />
-          {/* Labels */}
-          <text x="14" y="126" fill="#475569" fontSize="9" textAnchor="middle">
-            0
-          </text>
-          <text x="110" y="17" fill="#475569" fontSize="9" textAnchor="middle">
-            600
-          </text>
-          <text x="207" y="126" fill="#475569" fontSize="9" textAnchor="middle">
-            1200
-          </text>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-white/[0.03] rounded-xl p-6 border border-white/[0.06] flex flex-col items-center"
+    >
+      <h3 className="text-lg font-semibold text-white mb-1">US Grid Intensity Now</h3>
+      <div className="text-xs text-slate-500 mb-4">Weighted national average · lbs CO₂/MWh</div>
+      <div className="relative" style={{ filter: `drop-shadow(0 0 24px ${colors.glow})` }}>
+        <svg viewBox="0 0 220 130" className="w-56 h-auto">
+          {/* Track */}
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" strokeLinecap="round" />
+          {/* Fill */}
+          <motion.path
+            d={arcPath}
+            fill="none"
+            stroke={color}
+            strokeWidth="12"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+          />
+          {/* Tick labels */}
+          <text x="14" y="126" fill="#475569" fontSize="9" textAnchor="middle">0</text>
+          <text x="110" y="17" fill="#475569" fontSize="9" textAnchor="middle">600</text>
+          <text x="207" y="126" fill="#475569" fontSize="9" textAnchor="middle">1200</text>
         </svg>
-        <div className="gauge-center">
-          <div className="gauge-number" style={{ color }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center mt-2">
+          <motion.div
+            key={value}
+            initial={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-3xl font-bold"
+            style={{ color }}
+          >
             {value}
-          </div>
-          <div className="gauge-unit">lbs CO₂ / MWh</div>
+          </motion.div>
+          <div className="text-[10px] text-slate-500">lbs CO₂ / MWh</div>
         </div>
       </div>
-      <div className={`grid-status-badge ${level}`}>{getGridStatus(value).text}</div>
-    </div>
+      <div className={`mt-4 px-4 py-1.5 rounded-full text-sm font-semibold ${colors.bg} ${colors.text} ${colors.border} border`}
+        style={{ boxShadow: `0 0 16px ${colors.glow}` }}>
+        {getGridStatus(value).text}
+      </div>
+    </motion.div>
   );
 };
 
-/**
- * Zone cards for regional carbon intensity
- */
+/** Zone cards grid */
 const CarbonZoneCards: React.FC<{ regions: any[] }> = ({ regions }) => {
   const sorted = [...regions].sort((a, b) => a.intensity - b.intensity);
 
   return (
-    <div className="zone-grid">
-      {sorted.map((r) => {
+    <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+      {sorted.map((r, i) => {
         const level = getCarbonLevel(r.intensity);
+        const colors = levelColors[level];
         const trend = r.isDay && r.rad > 300 ? 'improving' : r.isDay ? 'stable' : 'worsening';
         const trendLabel = trend === 'improving' ? '↓ Solar reducing' : trend === 'worsening' ? '↑ No solar' : '→ Stable';
+        const trendColor = trend === 'improving' ? 'text-emerald-400' : trend === 'worsening' ? 'text-red-400' : 'text-slate-400';
 
         return (
-          <div key={r.id} className={`zone-card zone-${level}`}>
-            <div className="zone-name">{r.name}</div>
-            <div className="zone-region">{r.id}</div>
-            <div className={`zone-co2 ${level}`}>{r.intensity}</div>
-            <div className="zone-unit">lbs CO₂/MWh</div>
-            <div className={`zone-trend ${trend}`}>{trendLabel}</div>
-          </div>
+          <motion.div
+            key={r.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className={`bg-white/[0.02] rounded-lg p-3 border border-white/[0.06] hover:border-white/[0.12] transition-colors`}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-sm font-semibold text-white">{r.name}</div>
+                <div className="text-[10px] text-slate-500 uppercase tracking-wider">{r.id}</div>
+              </div>
+              <div className="text-right">
+                <div className={`text-lg font-bold ${colors.text}`}>{r.intensity}</div>
+                <div className="text-[10px] text-slate-500">lbs/MWh</div>
+              </div>
+            </div>
+            <div className={`text-[10px] mt-2 ${trendColor}`}>{trendLabel}</div>
+          </motion.div>
         );
       })}
     </div>
   );
 };
 
-/**
- * Hourly carbon intensity chart
- */
+/** Hourly chart */
 const CarbonHourlyChart: React.FC<{ data: any }> = ({ data }) => {
   const chartData = data.labels.map((label: string, idx: number) => ({
     time: label,
@@ -237,75 +268,73 @@ const CarbonHourlyChart: React.FC<{ data: any }> = ({ data }) => {
   }));
 
   return (
-    <div className="carbon-hourly-card">
-      <h3>CAISO Carbon Intensity — Today</h3>
-      <div className="subtitle">Modeled hourly intensity for California grid · lower = more renewable</div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white/[0.03] rounded-xl p-6 border border-white/[0.06]"
+    >
+      <h3 className="text-lg font-semibold text-white mb-1">CAISO Carbon Intensity — Today</h3>
+      <div className="text-xs text-slate-500 mb-4">Modeled hourly intensity for California grid · lower = more renewable</div>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-          <XAxis dataKey="time" stroke="#94a3b8" />
-          <YAxis stroke="#94a3b8" />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+          <XAxis dataKey="time" stroke="#94a3b8" fontSize={11} />
+          <YAxis stroke="#94a3b8" fontSize={11} />
           <Tooltip
-            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
+            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
             formatter={(value: number) => [`${value} lbs CO₂/MWh`, 'Intensity']}
           />
           <Line
             type="monotone"
             dataKey="intensity"
             stroke="#38bdf8"
+            strokeWidth={2}
             dot={false}
-            isAnimationActive={false}
+            isAnimationActive={true}
+            animationDuration={1200}
           />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </motion.div>
   );
 };
 
-/**
- * Bridge connecting carbon tracker to simulator
- */
+/** Simulator bridge */
 const CarbonSimulatorBridge: React.FC<{ currentIntensity: number; simFactor: number }> = ({
   currentIntensity,
   simFactor,
 }) => {
-  // Model: 2x storage → ~12% intensity reduction
   const reductionPct = (simFactor - 1.0) * 0.12;
   const projectedIntensity = Math.round(currentIntensity * (1 - reductionPct));
-
-  // US grid avg: ~400,000 MWh/hr
   const gridLoad = 400000;
   const tonsAvoided = Math.round((currentIntensity - projectedIntensity) * gridLoad / 2000);
 
   return (
-    <div className="carbon-bridge">
-      <div className="bridge-label">⚡ Connected to What-If Simulator</div>
-      <div className="bridge-text">
-        Right now the US grid emits approximately <strong>{currentIntensity}</strong> lbs CO₂/MWh. If storage deployment
-        was at <strong>{simFactor.toFixed(1)}x</strong>, projected intensity drops to <strong>{projectedIntensity}</strong>
-        {' '}lbs CO₂/MWh — a reduction of <strong>{Math.round(reductionPct * 100)}%</strong>.
-      </div>
-      <div className="bridge-numbers">
-        <div className="bridge-num">
-          <div className="bn-val" style={{ color: '#f87171' }}>
-            {currentIntensity}
-          </div>
-          <div className="bn-label">Current (lbs/MWh)</div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-sky-500/[0.04] border border-sky-500/20 rounded-xl p-6 backdrop-blur"
+    >
+      <div className="text-sky-400 text-sm font-semibold mb-3">⚡ Connected to What-If Simulator</div>
+      <p className="text-slate-300 text-sm leading-relaxed mb-4">
+        Right now the US grid emits approximately <span className="text-white font-bold">{currentIntensity}</span> lbs CO₂/MWh. If storage deployment
+        was at <span className="text-white font-bold">{simFactor.toFixed(1)}x</span>, projected intensity drops to <span className="text-emerald-400 font-bold">{projectedIntensity}</span> lbs CO₂/MWh — a reduction of <span className="text-white font-bold">{Math.round(reductionPct * 100)}%</span>.
+      </p>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-400">{currentIntensity}</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Current (lbs/MWh)</div>
         </div>
-        <div className="bridge-num">
-          <div className="bn-val" style={{ color: '#fbbf24' }}>
-            {projectedIntensity}
-          </div>
-          <div className="bn-label">At Simulator Rate</div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-amber-400">{projectedIntensity}</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">At Simulator Rate</div>
         </div>
-        <div className="bridge-num">
-          <div className="bn-val" style={{ color: '#34d399' }}>
-            {tonsAvoided.toLocaleString()}
-          </div>
-          <div className="bn-label">Tons Avoided/Hr</div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-emerald-400">{tonsAvoided.toLocaleString()}</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Tons Avoided/Hr</div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
