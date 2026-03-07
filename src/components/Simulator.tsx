@@ -119,6 +119,7 @@ export default function Simulator({ currentIntensity = 450 }: SimulatorProps) {
   const efficiency = 0.85;
   const diminishing = Math.log(1 + multiplier) / Math.log(1 + 2);
   const projectedIntensity = Math.round(currentIntensity * (1 - diminishing * efficiency * STORAGE_INTENSITY_REDUCTION_FACTOR));
+  const sliderPercent = ((multiplier - 1.0) / 1.0) * 100;
 
   return (
     <motion.div
