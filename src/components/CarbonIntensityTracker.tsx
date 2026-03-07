@@ -4,12 +4,13 @@ import {
   GRID_REGIONS,
   CARBON_THRESHOLDS,
   CARBON_COLORS,
+  STORAGE_INTENSITY_REDUCTION_FACTOR,
   getCarbonLevel,
   modelCarbonIntensity,
   buildHourlyCarbonCurve,
   getBestChargeWindow,
   getGridStatus,
-} from './carbonModel';
+} from '../services/carbonModel';
 
 interface CarbonTrackerProps {
   solarData?: any;
@@ -87,7 +88,17 @@ export const CarbonIntensityTracker: React.FC<CarbonTrackerProps> = ({ solarData
   }
 
   if (error) {
-    return <div className="p-8 text-center text-red-400">Error: {error}</div>;
+    return (
+      <div className="p-8 text-center text-red-400">
+        <div className="mb-3">Error: {error}</div>
+        <button
+          className="px-4 py-2 bg-slate-700 text-slate-200 rounded hover:bg-slate-600 text-sm"
+          onClick={() => { setError(null); setLoading(true); }}
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   const gridStatus = getGridStatus(currentIntensity);
@@ -269,8 +280,7 @@ const CarbonSimulatorBridge: React.FC<{ currentIntensity: number; simFactor: num
   currentIntensity,
   simFactor,
 }) => {
-  // Model: 2x storage → ~12% intensity reduction
-  const reductionPct = (simFactor - 1.0) * 0.12;
+  const reductionPct = (simFactor - 1.0) * STORAGE_INTENSITY_REDUCTION_FACTOR;
   const projectedIntensity = Math.round(currentIntensity * (1 - reductionPct));
 
   // US grid avg: ~400,000 MWh/hr

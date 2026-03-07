@@ -169,14 +169,29 @@ export const EMISSION_FACTORS: Record<string, number> = {
 };
 
 // Modeling constants
-const SOLAR_BOOST_MAX = 0.6; // can boost solar by up to 60%
+const SOLAR_BOOST_MAX = 0.45; // CAISO-validated: 40-50% actual solar displacement at peak radiation
 const GAS_OFFSET_FACTOR = 0.8; // offset gas by 80% of solar increase
 const PEAK_EVENING_MULTIPLIER = 1.12;
 const NIGHT_VALLEY_MULTIPLIER = 0.88;
-const HOT_TEMP_THRESHOLD = 32; // Celsius
-const COLD_TEMP_THRESHOLD = 0;
-const HOT_DEMAND_MULTIPLIER = 1.08;
-const COLD_DEMAND_MULTIPLIER = 1.06;
+
+// Season detection (Northern Hemisphere)
+type Season = 'summer' | 'winter' | 'shoulder';
+
+function getSeason(month: number): Season {
+  if (month >= 5 && month <= 8) return 'summer';   // Jun–Sep
+  if (month === 11 || month <= 1) return 'winter';  // Dec–Feb
+  return 'shoulder';
+}
+
+// Peak evening window varies by season (CAISO dispatch profiles)
+function isPeakHour(hourOfDay: number, season: Season): boolean {
+  if (season === 'winter') return hourOfDay >= 16 && hourOfDay <= 20;  // 4–8pm
+  if (season === 'summer') return hourOfDay >= 17 && hourOfDay <= 21;  // 5–9pm
+  return hourOfDay >= 16 && hourOfDay <= 21;                            // shoulder: broader window
+}
+
+// Storage impact on grid intensity (NREL estimate: 2x storage ≈ 12% reduction)
+export const STORAGE_INTENSITY_REDUCTION_FACTOR = 0.12;
 
 // Carbon intensity thresholds (lbs CO₂/MWh)
 export const CARBON_THRESHOLDS = {
@@ -210,7 +225,8 @@ export function modelCarbonIntensity(
   solarRadiation: number,
   tempC: number,
   isDay: boolean,
-  hourOfDay: number
+  hourOfDay: number,
+  month: number = new Date().getMonth()
 ): number {
   const mix = { ...region.stateMix };
 
@@ -222,23 +238,23 @@ export function modelCarbonIntensity(
   // Scale down gas to compensate for more solar
   const adjustedGas = Math.max(0, mix.gas - solarIncrease * GAS_OFFSET_FACTOR);
 
-  // Evening peak demand (5pm-9pm local) raises gas dispatch by up to 15%
-  const isPeakEvening = hourOfDay >= 17 && hourOfDay <= 21;
+  // Season-aware evening peak window (winter: 4-8pm, summer: 5-9pm)
+  const season = getSeason(month);
   const isNightValley = hourOfDay >= 1 && hourOfDay <= 5;
-  const peakMultiplier = isPeakEvening
+  const peakMultiplier = isPeakHour(hourOfDay, season)
     ? PEAK_EVENING_MULTIPLIER
     : isNightValley
       ? NIGHT_VALLEY_MULTIPLIER
       : 1.0;
   const finalGas = adjustedGas * peakMultiplier;
 
-  // Temperature extremes increase demand (cooling at >30°C, heating at <0°C)
-  const tempFactor =
-    tempC > HOT_TEMP_THRESHOLD
-      ? HOT_DEMAND_MULTIPLIER
-      : tempC < COLD_TEMP_THRESHOLD
-        ? COLD_DEMAND_MULTIPLIER
-        : 1.0;
+  // Temperature demand factor: gradient (not binary step)
+  // >35°C: +10%, 30-35°C: +6%, 0-10°C: +5%, <0°C: +8%
+  let tempFactor = 1.0;
+  if (tempC > 35) tempFactor = 1.10;
+  else if (tempC > 30) tempFactor = 1.0 + ((tempC - 30) / 5) * 0.06;
+  else if (tempC < 0) tempFactor = 1.08;
+  else if (tempC < 10) tempFactor = 1.0 + ((10 - tempC) / 10) * 0.05;
 
   const adjMix = { ...mix, solar: adjustedSolar, gas: Math.min(finalGas * tempFactor, 0.95) };
   const intensity = Object.entries(adjMix).reduce(
@@ -265,10 +281,12 @@ export function buildHourlyCarbonCurve(
   const hourlyTemp = solarData.hourly.temperature_2m || [];
 
   const hourlyValues = solarData.hourly.time.map((t: string, idx: number) => {
-    const h = new Date(t).getHours();
+    const date = new Date(t);
+    const h = date.getHours();
+    const m = date.getMonth();
     const rad = (solarData.hourly.direct_radiation?.[idx] || 0) + (solarData.hourly.diffuse_radiation?.[idx] || 0);
     const tempC = hourlyTemp[idx] ?? 20;
-    return modelCarbonIntensity(region, rad, tempC, rad > 20, h);
+    return modelCarbonIntensity(region, rad, tempC, rad > 20, h, m);
   });
 
   return {
