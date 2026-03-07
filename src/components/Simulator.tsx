@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
+import { motion } from 'motion/react';
 import { SIMULATOR_BASE_DATA } from '../data/staticData';
 import { STORAGE_INTENSITY_REDUCTION_FACTOR } from '../services/carbonModel';
 import {
@@ -36,10 +37,8 @@ export default function Simulator({ currentIntensity = 450 }: SimulatorProps) {
 
   useEffect(() => {
     const { storage, emissions, years, futureStorageBase, futureEmissionsBase } = SIMULATOR_BASE_DATA;
-    
-    // Calculate new future data based on multiplier
+
     const newFutureStorage = futureStorageBase.map(v => Number((v * multiplier).toFixed(1)));
-    
     // Log-curve diminishing returns (multi-LLM validated: DeepSeek + GPT-4o + Haiku agree)
     // Early storage additions yield higher reductions; marginal gains decrease
     // Formula: reduction = baseEmissions * diminishing * efficiency * STORAGE_INTENSITY_REDUCTION_FACTOR
@@ -61,7 +60,7 @@ export default function Simulator({ currentIntensity = 450 }: SimulatorProps) {
           label: 'Storage (GW)',
           data: fullStorage,
           borderColor: '#38bdf8',
-          backgroundColor: 'rgba(56, 189, 248, 0.1)',
+          backgroundColor: 'rgba(56, 189, 248, 0.08)',
           fill: true,
           tension: 0.4,
           yAxisID: 'y',
@@ -97,7 +96,7 @@ export default function Simulator({ currentIntensity = 450 }: SimulatorProps) {
         type: 'linear' as const,
         display: true,
         position: 'left' as const,
-        grid: { color: '#1e293b' },
+        grid: { color: 'rgba(255,255,255,0.03)' },
         ticks: { color: '#94a3b8' },
         title: { display: true, text: 'Storage (GW)', color: '#38bdf8' }
       },
@@ -122,7 +121,12 @@ export default function Simulator({ currentIntensity = 450 }: SimulatorProps) {
   const projectedIntensity = Math.round(currentIntensity * (1 - diminishing * efficiency * STORAGE_INTENSITY_REDUCTION_FACTOR));
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 shadow-lg shadow-black/20"
+    >
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white mb-2">What-If Simulator</h2>
         <p className="text-slate-400">Control the speed of deployment. See the impact.</p>
@@ -130,33 +134,62 @@ export default function Simulator({ currentIntensity = 450 }: SimulatorProps) {
 
       <div className="flex flex-col items-center justify-center mb-8">
         <div className="flex items-center gap-4 w-full max-w-lg">
-          <span className="text-slate-400 font-mono">1.0x</span>
-          <input 
-            type="range" 
-            min="100" 
-            max="200" 
-            value={multiplier * 100} 
-            onChange={(e) => setMultiplier(Number(e.target.value) / 100)}
-            className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-400"
-          />
+          <span className="text-slate-400 font-mono text-sm">1.0x</span>
+
+          {/* Custom styled slider */}
+          <div className="relative w-full h-10 flex items-center">
+            <div className="absolute w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 transition-all duration-150"
+                style={{ width: `${sliderPercent}%` }}
+              />
+            </div>
+            <input
+              type="range"
+              min="100"
+              max="200"
+              value={multiplier * 100}
+              onChange={(e) => setMultiplier(Number(e.target.value) / 100)}
+              className="absolute w-full h-2 opacity-0 cursor-pointer z-10"
+            />
+            <div
+              className="absolute w-5 h-5 rounded-full bg-sky-400 border-2 border-white shadow-[0_0_12px_rgba(56,189,248,0.5)] pointer-events-none transition-all duration-150"
+              style={{ left: `calc(${sliderPercent}% - 10px)` }}
+            />
+          </div>
+
           <span className="text-sky-400 font-bold font-mono text-xl w-16">{multiplier.toFixed(1)}x</span>
         </div>
-        
-        {/* Connection to Live Data */}
-        <div className="mt-6 bg-slate-900/80 border border-emerald-500/30 rounded-lg p-4 text-center max-w-2xl">
+
+        {/* Live connection card */}
+        <motion.div
+          key={multiplier}
+          initial={{ scale: 0.98, opacity: 0.7 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="mt-6 bg-emerald-500/[0.06] border border-emerald-500/20 rounded-xl p-4 text-center max-w-2xl backdrop-blur"
+        >
           <p className="text-emerald-400 font-medium">
             Live Connection:
             <span className="text-slate-300 ml-2">
-              Right now the grid is emitting <span className="text-white font-bold">{currentIntensity}</span> lbs/MWh. 
-              With <span className="text-white font-bold">{multiplier}x</span> storage, it would be <span className="text-emerald-300 font-bold">{projectedIntensity}</span> lbs/MWh.
+              Right now the grid is emitting <span className="text-white font-bold">{currentIntensity}</span> lbs/MWh.
+              With <span className="text-white font-bold">{multiplier.toFixed(1)}x</span> storage, it would be{' '}
+              <motion.span
+                key={projectedIntensity}
+                initial={{ scale: 1.2, color: '#6ee7b7' }}
+                animate={{ scale: 1, color: '#6ee7b7' }}
+                className="font-bold"
+              >
+                {projectedIntensity}
+              </motion.span>{' '}
+              lbs/MWh.
             </span>
           </p>
-        </div>
+        </motion.div>
       </div>
 
       <div className="h-[300px] w-full">
         <Line data={chartData} options={options} />
       </div>
-    </div>
+    </motion.div>
   );
 }
